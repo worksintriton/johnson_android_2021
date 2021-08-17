@@ -6,13 +6,13 @@
 
     <!-- view background color -->
     <solid
-        android:color="#246FC3" >
+        android:color="@color/colorPrimary" >
     </solid>
 
     <!-- view border color and width -->
     <stroke
         android:width="3dp"
-        android:color="#246FC3" >
+        android:color="@color/colorPrimary" >
     </stroke>
 
     <!-- If you want to add some padding -->

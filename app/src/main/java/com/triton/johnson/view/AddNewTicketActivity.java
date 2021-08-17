@@ -64,6 +64,7 @@ import com.triton.johnson.photopicker.activity.PickImageActivity;
 import com.triton.johnson.photoview.PhotoView;
 import com.triton.johnson.requestpojo.FaultTypeListRequest;
 import com.triton.johnson.requestpojo.JobNoListRequest;
+import com.triton.johnson.requestpojo.NotificationSendRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
 import com.triton.johnson.requestpojo.TicketCreateRequest;
 import com.triton.johnson.responsepojo.FaultTypeListResponse;
@@ -71,6 +72,7 @@ import com.triton.johnson.responsepojo.JobNoListResponse;
 import com.triton.johnson.responsepojo.ServingLevelListResponse;
 import com.triton.johnson.responsepojo.StationNameResponse;
 import com.triton.johnson.responsepojo.SuccessResponse;
+import com.triton.johnson.responsepojo.TicketSuccessResponse;
 import com.triton.johnson.session.SessionManager;
 import com.triton.johnson.sweetalertdialog.SweetAlertDialog;
 import com.triton.johnson.utils.ConnectionDetector;
@@ -1160,18 +1162,25 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         dialog.show();
 
         APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
-        Call<SuccessResponse> call = apiInterface.TicketCreateRequestCall(RestUtils.getContentType(), ticketCreateRequest());
+        Call<TicketSuccessResponse> call = apiInterface.TicketCreateRequestCall(RestUtils.getContentType(), ticketCreateRequest());
         Log.w(TAG,"TicketCreateRequestCall url  :%s"+" "+ call.request().url().toString());
 
-        call.enqueue(new Callback<SuccessResponse>() {
+        call.enqueue(new Callback<TicketSuccessResponse>() {
             @SuppressLint("LogNotTimber")
             @Override
-            public void onResponse(@NonNull Call<SuccessResponse> call, @NonNull Response<SuccessResponse> response) {
+            public void onResponse(@NonNull Call<TicketSuccessResponse> call, @NonNull Response<TicketSuccessResponse> response) {
                 dialog.dismiss();
-                Log.w(TAG,"SuccessResponse" + new Gson().toJson(response.body()));
+                Log.w(TAG,"TicketSuccessResponse" + new Gson().toJson(response.body()));
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
+                        if(response.body().getData() != null) {
+                            String ticketno = response.body().getData().getTicket_no();
+                            String notify_title = response.body().getData().getFault_type();
+                            String notify_descri = response.body().getData().getBreak_down_observed();
+                            NotificationSendRequestCall(ticketno, notify_title, notify_descri);
+                        }
+
                         message = response.body().getMessage();
                         new SweetAlertDialog(AddNewTicketActivity.this, SweetAlertDialog.SUCCESS_TYPE)
                                 .setTitleText(getResources().getString(R.string.app_name))
@@ -1195,7 +1204,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
             @SuppressLint("LongLogTag")
             @Override
-            public void onFailure(@NonNull Call<SuccessResponse> call,@NonNull Throwable t) {
+            public void onFailure(@NonNull Call<TicketSuccessResponse> call,@NonNull Throwable t) {
                 dialog.dismiss();
                 Log.w("SuccessResponse flr", "--->" + t.getMessage());
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1235,6 +1244,68 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         ticketCreateRequest.setImage_list(image_list);
         Log.w(TAG,"ticketCreateRequest "+ new Gson().toJson(ticketCreateRequest));
         return ticketCreateRequest;
+    }
+
+
+    @SuppressLint("LogNotTimber")
+    private void NotificationSendRequestCall(String ticketno, String notify_title, String notify_descri) {
+        dialog = new Dialog(AddNewTicketActivity.this, R.style.NewProgressDialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.progroess_popup);
+        dialog.show();
+
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<SuccessResponse> call = apiInterface.NotificationSendRequestCall(RestUtils.getContentType(), notificationSendRequest(ticketno,notify_title,notify_descri));
+        Log.w(TAG,"TicketCreateRequestCall url  :%s"+" "+ call.request().url().toString());
+
+        call.enqueue(new Callback<SuccessResponse>() {
+            @SuppressLint("LogNotTimber")
+            @Override
+            public void onResponse(@NonNull Call<SuccessResponse> call, @NonNull Response<SuccessResponse> response) {
+                dialog.dismiss();
+                Log.w(TAG,"TicketSuccessResponse" + new Gson().toJson(response.body()));
+                if (response.body() != null) {
+
+                    if (200 == response.body().getCode()) {
+
+
+
+                    }
+                }
+
+
+            }
+
+            @SuppressLint("LongLogTag")
+            @Override
+            public void onFailure(@NonNull Call<SuccessResponse> call,@NonNull Throwable t) {
+                dialog.dismiss();
+                Log.w("SuccessResponse flr", "--->" + t.getMessage());
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+    private NotificationSendRequest notificationSendRequest(String ticketno, String notify_title, String notify_descri) {
+
+        /*
+         * ticket_no : 1
+         * notify_title :
+         * notify_descri :
+         * date_and_time :
+         */
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.getDefault());
+        String currentDateandTime = sdf.format(new Date());
+
+        NotificationSendRequest notificationSendRequest = new NotificationSendRequest();
+        notificationSendRequest.setTicket_no(ticketno);
+        notificationSendRequest.setNotify_title(notify_title);
+        notificationSendRequest.setNotify_descri(notify_descri);
+        notificationSendRequest.setDate_and_time(currentDateandTime);
+        Log.w(TAG,"notificationSendRequest "+ new Gson().toJson(notificationSendRequest));
+        return notificationSendRequest;
     }
 
 
