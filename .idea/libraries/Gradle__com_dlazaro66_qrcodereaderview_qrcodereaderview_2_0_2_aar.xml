@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="Gradle: com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.2@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cb3a7c2db6f32bfae96a0fbb4621dd01/jetified-qrcodereaderview-2.0.2/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/75e66954bdbc05d3e1bdb6353eff07e6/jetified-qrcodereaderview-2.0.2/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/2164a799e737993b2be2441b5b0168b3/jetified-qrcodereaderview-2.0.2/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cca2a913273137c8cb7b15dab3d69c6a/jetified-qrcodereaderview-2.0.2/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/faa7b4496e10f5ab59e2f2d868d606dd/jetified-qrcodereaderview-2.0.2/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/faa7b4496e10f5ab59e2f2d868d606dd/jetified-qrcodereaderview-2.0.2/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/faa7b4496e10f5ab59e2f2d868d606dd/jetified-qrcodereaderview-2.0.2/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dlazaro66.qrcodereaderview/qrcodereaderview/2.0.2/afb4bd0e9f9d59b85a10e588b4bed4943e67cace/qrcodereaderview-2.0.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dlazaro66.qrcodereaderview/qrcodereaderview/2.0.2/787fa5042b4bc9b884560c36749198497b12dec0/qrcodereaderview-2.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
