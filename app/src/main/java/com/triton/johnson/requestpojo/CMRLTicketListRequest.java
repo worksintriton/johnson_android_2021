@@ -11,6 +11,15 @@ public class CMRLTicketListRequest {
     private String type;
     private String station_id;
     private String break_down_reported_by;
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getType() {
         return type;

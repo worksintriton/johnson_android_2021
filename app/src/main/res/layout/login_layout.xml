@@ -236,7 +236,8 @@
                             android:layout_height="wrap_content"
                             android:text="Forgot Password?"
                             android:textColor="@color/colorPrimary"
-                            android:textSize="12dp" />
+                            android:textSize="12dp"
+                            android:visibility="gone"/>
                     </LinearLayout>
                 </LinearLayout>
 

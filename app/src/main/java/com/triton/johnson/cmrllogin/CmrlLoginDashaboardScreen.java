@@ -89,8 +89,14 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
     private List<CMRLTicketListResponse.DataBean> ticketList = new ArrayList<>();
     private List<StationNameResponse.DataBean> stationNameList = new ArrayList<>();
     HashMap<String, String> hashMap_StationId = new HashMap<>();
-    Spinner spinner_stationname;
+    Spinner spinner_ticket_status, spinner_stationname;
     private String StationName;
+
+    private String status = "Open";
+    ArrayAdapter<String> spinnerArrayAdapter;
+    LinearLayout ll_search,ll_clear;
+    Button btn_search;
+
 
     @SuppressLint("RestrictedApi")
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -129,6 +135,28 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         emptyCustomFontTextView.setVisibility(View.GONE);
         floatingActionButton.setVisibility(View.GONE);
 
+        spinner_ticket_status = view.findViewById(R.id.spinner_ticket_status);
+
+        String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
+        spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+        spinner_ticket_status.setAdapter(spinnerArrayAdapter);
+        spinner_ticket_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int arg2, long arg3) {
+                ((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.black));
+                status = spinner_ticket_status.getSelectedItem().toString();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
 
 
         spinner_stationname = view.findViewById(R.id.spinner_stationname);
@@ -140,7 +168,7 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                 StationName_id = hashMap_StationId.get(StationName);
                 Log.w(TAG,"StationName : "+StationName+" StationName_id : "+StationName_id);
                 if(StationName_id != null){
-                    CMRLTicketListResponseCall();
+                   // CMRLTicketListResponseCall();
 
                 }else{
                     StationName_id = "";
@@ -156,6 +184,37 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         });
 
 
+        ll_search = view.findViewById(R.id.ll_search);
+        btn_search = view.findViewById(R.id.btn_search);
+        ll_clear = view.findViewById(R.id.ll_clear);
+        ll_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CMRLTicketListResponseCall();
+
+            }
+        });
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CMRLTicketListResponseCall();
+
+            }
+        });
+        ll_clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StationName_id = "";
+                status = "Open";
+                String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
+                spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+                spinner_ticket_status.setAdapter(spinnerArrayAdapter);
+                StationNameResponseCall();
+            }
+        });
+
+
 
 
 
@@ -165,6 +224,10 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
             StationName_id = "";
             elvalorLine.setVisibility(View.VISIBLE);
             underLine.setVisibility(View.INVISIBLE);
+            status = "Open";
+            spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+            spinner_ticket_status.setAdapter(spinnerArrayAdapter);
             StationNameResponseCall();
 
         });
@@ -174,41 +237,15 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
             StationName_id = "";
             elvalorLine.setVisibility(View.INVISIBLE);
             underLine.setVisibility(View.VISIBLE);
+            status = "Open";
+            spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+            spinner_ticket_status.setAdapter(spinnerArrayAdapter);
             StationNameResponseCall();
 
 
         });
-               /* changePasswordLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                new SweetAlertDialog(AdminDepartmentScreen.this, SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText("CMRL")
-                        .setContentText("Do you want to change password?")
-                        .setCancelText("No")
-                        .setConfirmText("Yes")
-                        .showCancelButton(true)
-                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sDialog) {
-
-                                sDialog.dismiss();
-                            }
-                        })
-                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sDialog) {
-
-                                sDialog.dismiss();
-                                Intent intent = new Intent(AdminDepartmentScreen.this, ChangepawwordActivity.class);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.new_right, R.anim.new_left);
-                            }
-                        })
-                        .show();
-
-            }
-        });*/
 
         sideMenuLayout.setOnClickListener(view12 -> CmrlLoginDashboardActivity.drawerLayout.openDrawer(CmrlLoginDashboardActivity.nvDrawer));
         retryButton.setOnClickListener(view13 -> {
@@ -448,14 +485,11 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
          * station_id : 611510c34f912e1856fc6d44
          * break_down_reported_by : 6113acf26ee293224d81081c
          */
-
-
-
-
         CMRLTicketListRequest cmrlTicketListRequest = new CMRLTicketListRequest();
         cmrlTicketListRequest.setStation_id(StationName_id);
         cmrlTicketListRequest.setBreak_down_reported_by(id);
         cmrlTicketListRequest.setType(String.valueOf(type));
+        cmrlTicketListRequest.setStatus(status);
         Log.w(TAG,"cmrlTicketListRequest "+ new Gson().toJson(cmrlTicketListRequest));
         return cmrlTicketListRequest;
     }
@@ -516,10 +550,7 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
             for (int i = 0; i < data.size(); i++) {
                 String StationName = data.get(i).getStation_name();
                 hashMap_StationId.put(data.get(i).getStation_name(), data.get(i).get_id());
-
-                Log.w(TAG, "StationName-->" + StationName);
                 StationArrayList.add(StationName);
-
                 ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, StationArrayList);
                 spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
                 spinner_stationname.setAdapter(spinnerArrayAdapter);
@@ -536,10 +567,12 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
     private StationNameRequest stationNameRequest(int type) {
         /*
          * type : 1
+         * status
          */
 
         StationNameRequest stationNameRequest = new StationNameRequest();
         stationNameRequest.setType(type);
+
         Log.w(TAG,"stationNameRequest "+ new Gson().toJson(stationNameRequest));
         return stationNameRequest;
     }

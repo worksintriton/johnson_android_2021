@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationView;
 import com.triton.johnson.R;
+import com.triton.johnson.johnsonlogin.JohnsonLoginAttendanceScreen;
 import com.triton.johnson.johnsonlogin.JohnsonLoginDashaboardScreen;
 import com.triton.johnson.session.SessionManager;
 import com.triton.johnson.sweetalertdialog.SweetAlertDialog;
@@ -138,8 +139,22 @@ public class JohnshonLoginDashboardActivity extends AppCompatActivity {
         switch (menuItem.getItemId()) {
 
             case R.id.home_fragment:
-            case R.id.favorites_fragment:
                 fragmentClass = JohnsonLoginDashaboardScreen.class;
+
+                try {
+
+                    fragment = (Fragment) fragmentClass.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+
+                    e.printStackTrace();
+
+                }
+                tabSelects = "0";
+                transaction = getSupportFragmentManager().beginTransaction();
+                transaction.addToBackStack("NotificationFragment").setCustomAnimations(R.anim.slide_in_left, 0, 0, R.anim.slide_out_left).replace(R.id.flContent, fragment).commit();
+                break;
+            case R.id.favorites_fragment:
+                fragmentClass = JohnsonLoginAttendanceScreen.class;
 
                 try {
 

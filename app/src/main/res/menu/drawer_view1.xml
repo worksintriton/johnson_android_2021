@@ -6,9 +6,8 @@
             android:title="HOME" />
         <item
             android:id="@+id/favorites_fragment"
-            android:icon="@drawable/like"
-            android:title="FAVORITES"
-            android:visible="false"/>
+            android:icon="@drawable/new_user"
+            android:title="ATTENDANCE" />
         <item
             android:id="@+id/change_password"
             android:icon="@mipmap/padlock"

@@ -1,20 +1,20 @@
 package com.triton.johnson.api;
 
 import com.triton.johnson.model.ImageUploadResponse;
+import com.triton.johnson.requestpojo.AttendanceCreateRequest;
 import com.triton.johnson.requestpojo.CMRLTicketListRequest;
-import com.triton.johnson.requestpojo.FBTokenUpdateRequest;
+import com.triton.johnson.requestpojo.CheckAttendanceRequest;
 import com.triton.johnson.requestpojo.FaultTypeListRequest;
 import com.triton.johnson.requestpojo.JobNoListRequest;
 import com.triton.johnson.requestpojo.JohnsonTicketListRequest;
 import com.triton.johnson.requestpojo.LoginRequest;
-import com.triton.johnson.requestpojo.NotificationSendRequest;
 import com.triton.johnson.requestpojo.ServingLevelListRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
 import com.triton.johnson.requestpojo.TicketCreateRequest;
 import com.triton.johnson.requestpojo.UpdateIsuesStatusRequest;
 import com.triton.johnson.requestpojo.ViewTicketsRequest;
 import com.triton.johnson.responsepojo.CMRLTicketListResponse;
-import com.triton.johnson.responsepojo.FBTokenUpdateResponse;
+import com.triton.johnson.responsepojo.CheckAttendanceResponse;
 import com.triton.johnson.responsepojo.FaultTypeListResponse;
 import com.triton.johnson.responsepojo.JobNoListResponse;
 import com.triton.johnson.responsepojo.JohnsonTicketListResponse;
@@ -22,7 +22,6 @@ import com.triton.johnson.responsepojo.LoginResponse;
 import com.triton.johnson.responsepojo.ServingLevelListResponse;
 import com.triton.johnson.responsepojo.StationNameResponse;
 import com.triton.johnson.responsepojo.SuccessResponse;
-import com.triton.johnson.responsepojo.TicketSuccessResponse;
 import com.triton.johnson.responsepojo.ViewTicketsResponse;
 
 import okhttp3.MultipartBody;
@@ -64,16 +63,7 @@ public interface APIInterface {
 
     /*Ticket create*/
     @POST("ticket/create")
-    Call<TicketSuccessResponse> TicketCreateRequestCall(@Header("Content-Type") String type, @Body TicketCreateRequest ticketCreateRequest);
-
-    /*Notification send*/
-    @POST("notification/send_notifiation")
-    Call<SuccessResponse> NotificationSendRequestCall(@Header("Content-Type") String type, @Body NotificationSendRequest notificationSendRequest);
-
-    /*Notification send*/
-    @POST("notification/send_notifiation_update")
-    Call<SuccessResponse> NotificationSendUpdateRequestCall(@Header("Content-Type") String type, @Body NotificationSendRequest notificationSendRequest);
-
+    Call<SuccessResponse> TicketCreateRequestCall(@Header("Content-Type") String type, @Body TicketCreateRequest ticketCreateRequest);
 
     /*CMRL Ticket list*/
     @POST("ticket/getlist_by_type")
@@ -96,15 +86,19 @@ public interface APIInterface {
     Call<ViewTicketsResponse> ViewTicketsResponseCall(@Header("Content-Type") String type, @Body ViewTicketsRequest viewTicketsRequest);
 
 
+    /*check attendance*/
+    @POST("attendance/check_attendance")
+    Call<CheckAttendanceResponse> CheckAttendanceRequestCall(@Header("Content-Type") String type, @Body CheckAttendanceRequest checkAttendanceRequest);
+
+
+    /*check attendance*/
+    @POST("attendance/create")
+    Call<SuccessResponse> AttendanceCreateRequestCall(@Header("Content-Type") String type, @Body AttendanceCreateRequest attendanceCreateRequest);
+
+
     @Multipart
     @POST("upload")
     Call<ImageUploadResponse> getImageStroeResponse(@Part MultipartBody.Part file);
-
-
-    /*Notification token update*/
-    @POST("userdetails/mobile/update/fb_token")
-    Call<FBTokenUpdateResponse> fBTokenUpdateResponseCall(@Header("Content-Type") String type, @Body FBTokenUpdateRequest fbTokenUpdateRequest);
-
 
 
 }

@@ -60,7 +60,6 @@ import com.triton.johnson.arraylist.IssueList;
 import com.triton.johnson.materialspinner.MaterialSpinner;
 import com.triton.johnson.model.ImageUploadResponse;
 import com.triton.johnson.photoview.PhotoView;
-import com.triton.johnson.requestpojo.NotificationSendRequest;
 import com.triton.johnson.requestpojo.TicketCreateRequest;
 import com.triton.johnson.requestpojo.UpdateIsuesStatusRequest;
 import com.triton.johnson.responsepojo.StationNameResponse;
@@ -216,6 +215,7 @@ public class UpdateStatusActivity extends AppCompatActivity {
         String[] statuslist = {"Select status","Inprogress"};
         String[] statuslist1 = {"Select status","Pending","Completed"};
         String[] statuslist2 = {"Select status","Completed"};
+
 
         if(ticketStatus != null && !ticketStatus.isEmpty()){
             if(ticketStatus.equalsIgnoreCase("Open")){
@@ -918,7 +918,6 @@ public class UpdateStatusActivity extends AppCompatActivity {
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
-                        NotificationSendUpdateRequestCall(ticketId,StatusName,issuseEditText.getText().toString());
 
                         startActivity(new Intent(getApplicationContext(),JohnshonLoginDashboardActivity.class));
 
@@ -1195,66 +1194,4 @@ public class UpdateStatusActivity extends AppCompatActivity {
         });
 
     }
-
-    @SuppressLint("LogNotTimber")
-    private void NotificationSendUpdateRequestCall(String ticketno, String notify_title, String notify_descri) {
-        dialog = new Dialog(UpdateStatusActivity.this, R.style.NewProgressDialog);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.progroess_popup);
-        dialog.show();
-
-        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
-        Call<SuccessResponse> call = apiInterface.NotificationSendUpdateRequestCall(RestUtils.getContentType(), notificationSendRequest(ticketno,notify_title,notify_descri));
-        Log.w(TAG,"TicketCreateRequestCall url  :%s"+" "+ call.request().url().toString());
-
-        call.enqueue(new Callback<SuccessResponse>() {
-            @SuppressLint("LogNotTimber")
-            @Override
-            public void onResponse(@NonNull Call<SuccessResponse> call, @NonNull Response<SuccessResponse> response) {
-                dialog.dismiss();
-                Log.w(TAG,"TicketSuccessResponse" + new Gson().toJson(response.body()));
-                if (response.body() != null) {
-
-                    if (200 == response.body().getCode()) {
-
-
-
-                    }
-                }
-
-
-            }
-
-            @SuppressLint("LongLogTag")
-            @Override
-            public void onFailure(@NonNull Call<SuccessResponse> call,@NonNull Throwable t) {
-                dialog.dismiss();
-                Log.w("SuccessResponse flr", "--->" + t.getMessage());
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
-    private NotificationSendRequest notificationSendRequest(String ticketno, String notify_title, String notify_descri) {
-
-        /*
-         * ticket_no : 1
-         * notify_title :
-         * notify_descri :
-         * date_and_time :
-         */
-
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.getDefault());
-        String currentDateandTime = sdf.format(new Date());
-
-        NotificationSendRequest notificationSendRequest = new NotificationSendRequest();
-        notificationSendRequest.setTicket_no(ticketno);
-        notificationSendRequest.setNotify_title(notify_title);
-        notificationSendRequest.setNotify_descri(notify_descri);
-        notificationSendRequest.setDate_and_time(currentDateandTime);
-        Log.w(TAG,"notificationSendRequest "+ new Gson().toJson(notificationSendRequest));
-        return notificationSendRequest;
-    }
-
 }

@@ -23,9 +23,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.triton.johnson.R;
 import com.triton.johnson.api.APIInterface;
@@ -34,9 +31,7 @@ import com.triton.johnson.api.RetrofitClient;
 import com.triton.johnson.arraylist.StationList;
 import com.triton.johnson.materialeditext.MaterialEditText;
 import com.triton.johnson.materialspinner.MaterialSpinner;
-import com.triton.johnson.requestpojo.FBTokenUpdateRequest;
 import com.triton.johnson.requestpojo.LoginRequest;
-import com.triton.johnson.responsepojo.FBTokenUpdateResponse;
 import com.triton.johnson.responsepojo.LoginResponse;
 import com.triton.johnson.session.SessionManager;
 import com.triton.johnson.sweetalertdialog.SweetAlertDialog;
@@ -90,9 +85,6 @@ public class JohnsonLogin extends AppCompatActivity {
     SessionManager sessionManager;
     private String role = "";
 
-    private String userid;
-    private String token = "";
-
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -115,39 +107,9 @@ public class JohnsonLogin extends AppCompatActivity {
         loginButton = findViewById(R.id.loginnnn_button);
 
         forgotLinearLayout = findViewById(R.id.forgot_layout);
-        forgotLinearLayout.setVisibility(View.GONE);
         loginMainLinearLayout = findViewById(R.id.login_main_layout);
 
         mainReasonCustomFontTextView = findViewById(R.id.request_reason_text);
-
-        try{
-            // Initialize Firebase
-            FirebaseApp.initializeApp(getApplicationContext());
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
-            FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-            FirebaseMessaging.getInstance().getToken()
-                    .addOnCompleteListener(task -> {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        token = task.getResult();
-                        Log.w(TAG,"token--->"+ token);
-
-
-
-                    });
-
-
-
-        }
-        catch (Exception e){
-            Log.w(TAG,"FCM : "+e.getLocalizedMessage());
-            Log.w(TAG,"FCM Message : "+e.getMessage());
-            e.printStackTrace();
-        }
 
         mainMaterialSpinner.setOnItemSelectedListener((MaterialSpinner.OnItemSelectedListener<String>) (view, position, id, item) -> {
 
@@ -282,7 +244,7 @@ public class JohnsonLogin extends AppCompatActivity {
 
         });
 
-        StationListUrl();
+        //StationListUrl();
     }
 
     // default back button action
@@ -318,7 +280,7 @@ public class JohnsonLogin extends AppCompatActivity {
 
         } else {
 
-            StationListUrl();
+            //StationListUrl();
         }
     }
 
@@ -533,9 +495,6 @@ public class JohnsonLogin extends AppCompatActivity {
                 if (response.body() != null) {
                     message = response.body().getMessage();
                     if (200 == response.body().getCode()) {
-                        userid = response.body().getData().get_id();
-                        fBTokenUpdateResponseCall();
-
                         new SweetAlertDialog(JohnsonLogin.this, SweetAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("JOHNSON")
                                 .setContentText(message)
@@ -603,55 +562,6 @@ public class JohnsonLogin extends AppCompatActivity {
         loginRequest.setPassword(passwordMaterialEditText.getText().toString());
         Log.w(TAG,"loginRequest "+ new Gson().toJson(loginRequest));
         return loginRequest;
-    }
-
-    @SuppressLint("LogNotTimber")
-    private void fBTokenUpdateResponseCall() {
-       /* dialog = new Dialog(CMRLLogin.this, R.style.NewProgressDialog);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.progroess_popup);
-        dialog.show();*/
-        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
-        Call<FBTokenUpdateResponse> call = apiInterface.fBTokenUpdateResponseCall(RestUtils.getContentType(), fbTokenUpdateRequest());
-        Log.w(TAG,"fBTokenUpdateResponseCall url  :%s"+" "+ call.request().url().toString());
-
-        call.enqueue(new Callback<FBTokenUpdateResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<FBTokenUpdateResponse> call, @NonNull Response<FBTokenUpdateResponse> response) {
-
-                Log.w(TAG,"fBTokenUpdateResponseCall"+ "--->" + new Gson().toJson(response.body()));
-
-
-                //   dialog.dismiss();
-
-                if (response.body() != null) {
-                    if (response.body().getCode() == 200) {
-
-
-                    }
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<FBTokenUpdateResponse> call, @NonNull Throwable t) {
-
-                // dialog.dismiss();
-                Log.w(TAG,"FBTokenUpdateResponse flr"+"--->" + t.getMessage());
-
-            }
-        });
-
-    }
-    private FBTokenUpdateRequest fbTokenUpdateRequest() {
-        FBTokenUpdateRequest fbTokenUpdateRequest = new FBTokenUpdateRequest();
-        fbTokenUpdateRequest.setUser_id(userid);
-        fbTokenUpdateRequest.setFb_token(token);
-        Log.w(TAG,"fbTokenUpdateRequest"+ "--->" + new Gson().toJson(fbTokenUpdateRequest));
-        //  Toasty.success(getApplicationContext(),"fbTokenUpdateRequest : "+new Gson().toJson(fbTokenUpdateRequest), Toast.LENGTH_SHORT, true).show();
-
-        return fbTokenUpdateRequest;
     }
 }
 

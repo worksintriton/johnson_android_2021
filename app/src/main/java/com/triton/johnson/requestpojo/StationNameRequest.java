@@ -4,10 +4,10 @@ public class StationNameRequest {
 
     /**
      * type : 1
+     * status
      */
 
     private int type;
-
     public int getType() {
         return type;
     }

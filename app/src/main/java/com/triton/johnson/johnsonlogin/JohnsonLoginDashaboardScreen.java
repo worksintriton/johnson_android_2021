@@ -54,6 +54,7 @@ import com.triton.johnson.utils.RestUtils;
 import com.triton.johnson.view.JohnshonLoginDashboardActivity;
 import com.triton.johnson.view.DepartmentListClass;
 import com.triton.johnson.view.ProfileActivity;
+import com.triton.johnson.view.UpdateStatusActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,7 +98,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
     private List<StationNameResponse.DataBean> stationNameList = new ArrayList<>();
     HashMap<String, String> hashMap_StationId = new HashMap<>();
     HashMap<String, String> hashMap_JobNoId = new HashMap<>();
-    Spinner spinner_stationname,spinner_jobno;
+    Spinner spinner_ticket_status,spinner_stationname,spinner_jobno;
     private String StationName;
     private String StationName_id = "";
     String JobName,JobName_id = "";
@@ -106,6 +107,8 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
     LinearLayout ll_search,ll_clear,ll_job_no;
     Button btn_search;
+    private String status = "Open";
+    ArrayAdapter<String> spinnerArrayAdapter;
 
 
     @SuppressLint("RestrictedApi")
@@ -142,6 +145,30 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         mWaveSwipeRefreshLayout.setOnRefreshListener(this);
         emptyCustomFontTextView.setVisibility(View.GONE);
         floatingActionButton.setVisibility(View.GONE);
+
+        spinner_ticket_status = view.findViewById(R.id.spinner_ticket_status);
+
+        String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
+        spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+        spinner_ticket_status.setAdapter(spinnerArrayAdapter);
+        spinner_ticket_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int arg2, long arg3) {
+                ((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.black));
+                status = spinner_ticket_status.getSelectedItem().toString();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+
 
         spinner_stationname = view.findViewById(R.id.spinner_stationname);
         ll_job_no = view.findViewById(R.id.ll_job_no);
@@ -199,6 +226,11 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             type = 1;
             StationName_id = "";
             JobName_id = "";
+            status = "Open";
+            spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+            spinner_ticket_status.setAdapter(spinnerArrayAdapter);
+
             elvalorLine.setVisibility(View.VISIBLE);
             underLine.setVisibility(View.INVISIBLE);
             //DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id="+id);
@@ -211,6 +243,10 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             type = 2;
             StationName_id = "";
             JobName_id = "";
+            status = "Open";
+            spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+            spinner_ticket_status.setAdapter(spinnerArrayAdapter);
             elvalorLine.setVisibility(View.INVISIBLE);
             underLine.setVisibility(View.VISIBLE);
            // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
@@ -263,7 +299,8 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                 emptyImageView.setImageResource(R.mipmap.wifi);
                 emptyCustomFontTextView.setText(R.string.pleasecheckyourinternet);
                 floatingActionButton.setVisibility(View.GONE);
-            } else {
+            }
+            else {
                 if (selectStatus.equalsIgnoreCase("0")) {
                     type = 1;
                    // DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
@@ -358,6 +395,11 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             public void onClick(View view) {
                 StationName_id = "";
                 JobName_id = "";
+                status = "Open";
+                String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
+                spinnerArrayAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(), R.layout.spinner_item, ticketstatus);
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+                spinner_ticket_status.setAdapter(spinnerArrayAdapter);
                 JohnSonTicketListResponseCall();
             }
         });
@@ -573,7 +615,6 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                 String StationName = data.get(i).getStation_name();
                 hashMap_StationId.put(data.get(i).getStation_name(), data.get(i).get_id());
 
-                Log.w(TAG, "StationName-->" + StationName);
                 StationArrayList.add(StationName);
 
                 ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, StationArrayList);
@@ -679,6 +720,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
          * type : 1
          * station_id : 611511214f912e1856fc6d46
          * job_id : 61151dbaac7f9e21e2963133
+         * status :
          */
 
 
@@ -687,6 +729,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         johnsonTicketListRequest.setType(String.valueOf(type));
         johnsonTicketListRequest.setStation_id(StationName_id);
         johnsonTicketListRequest.setJob_id(JobName_id);
+        johnsonTicketListRequest.setStatus(status);
         Log.w(TAG,"johnsonTicketListRequest "+ new Gson().toJson(johnsonTicketListRequest));
         return johnsonTicketListRequest;
     }

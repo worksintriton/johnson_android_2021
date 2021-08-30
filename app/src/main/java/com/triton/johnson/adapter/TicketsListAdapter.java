@@ -59,7 +59,7 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView dateTextView, txt_status, textTicketID, nameTextView, reasonTextView, amTextView, monthTextView, yearTextview,txt_job_id,txt_fault_type,txt_serving_level,txt_dateofcreate;
+        TextView dateTextView, txt_status, textTicketID, nameTextView, reasonTextView, amTextView, monthTextView, yearTextview,txt_job_id,txt_fault_type,txt_serving_level;
 
         LinearLayout rscheduleLinearLayout, wholeLayout;
 
@@ -84,7 +84,6 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
             circularImageView = view.findViewById(R.id.profile_image);
             clockImageView = view.findViewById(R.id.image);
             txt_serving_level = view.findViewById(R.id.txt_serving_level);
-            txt_dateofcreate = view.findViewById(R.id.txt_dateofcreate);
         }
     }
 
@@ -159,9 +158,6 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
         }
         if(dataBean.getFault_type() != null) {
          holder.txt_fault_type.setText(dataBean.getFault_type());
-        }
-        if(dataBean.getDate_of_create() != null) {
-         holder.txt_dateofcreate.setText(dataBean.getDate_of_create());
         }
         if(dataBean.getBreak_down_observed() != null) {
          holder.reasonTextView.setText(dataBean.getBreak_down_observed());
