@@ -97,6 +97,10 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
     LinearLayout ll_search,ll_clear;
     Button btn_search;
 
+    TextView open_count,inprogress_count,pending_count,completed_count,close_count;
+    LinearLayout openLayout, inprogressLayout, pendingLayout, completeLayout, closeLayout;
+
+
 
     @SuppressLint("RestrictedApi")
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -110,6 +114,60 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         SessionManager sessionManager = new SessionManager(getActivity());
         HashMap<String, String> hashMap = sessionManager.getUserDetails();
         id = hashMap.get(SessionManager.KEY_ID);
+
+        open_count = view.findViewById(R.id.open_count);
+        inprogress_count = view.findViewById(R.id.inprogress_count);
+        pending_count = view.findViewById(R.id.pending_count);
+        completed_count = view.findViewById(R.id.completed_count);
+        close_count = view.findViewById(R.id.close_count);
+
+        openLayout = view.findViewById(R.id.back1);
+        inprogressLayout = view.findViewById(R.id.back2);
+        pendingLayout = view.findViewById(R.id.back3);
+        completeLayout = view.findViewById(R.id.back4);
+        closeLayout = view.findViewById(R.id.back5);
+
+
+        openLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Open");
+                startActivity(intent);
+            }
+        });
+        inprogressLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Inprogress");
+                startActivity(intent);
+            }
+        });
+        pendingLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Pending");
+                startActivity(intent);
+            }
+        });
+        completeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Completed");
+                startActivity(intent);
+            }
+        });
+        closeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Close");
+                startActivity(intent);
+            }
+        });
 
         recyclerView = view.findViewById(R.id.recycler_view);
         emptyCustomFontTextView =  view.findViewById(R.id.empty_text);
@@ -157,8 +215,6 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
             }
         });
 
-
-
         spinner_stationname = view.findViewById(R.id.spinner_stationname);
         spinner_stationname.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -182,7 +238,6 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
 
             }
         });
-
 
         ll_search = view.findViewById(R.id.ll_search);
         btn_search = view.findViewById(R.id.btn_search);
@@ -213,10 +268,6 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                 StationNameResponseCall();
             }
         });
-
-
-
-
 
         elvatorLayout.setOnClickListener(view1 -> {
             selectStatus = "0";
@@ -349,7 +400,6 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
 
         refresh();
     }
-
     private void refresh() {
         new Handler().postDelayed(() -> {
             // Refresh the department list to call api again
@@ -437,7 +487,7 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                             emptyImageView.setVisibility(View.GONE);
                             retryButton.setVisibility(View.GONE);
                             emptyCustomFontTextView.setVisibility(View.GONE);
-                            ticketsListAdapter = new TicketsListAdapter(getActivity(), ticketList, "", "");
+                            //ticketsListAdapter = new TicketsListAdapter(getActivity(), ticketList, "", "");
 
 
                             mLayoutManager = new LinearLayoutManager(getActivity());

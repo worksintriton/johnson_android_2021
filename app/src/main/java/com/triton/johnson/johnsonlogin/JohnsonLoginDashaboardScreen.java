@@ -42,6 +42,7 @@ import com.triton.johnson.api.APIInterface;
 
 import com.triton.johnson.api.RetrofitClient;
 import com.triton.johnson.arraylist.Adminstationlist;
+import com.triton.johnson.cmrllogin.CMRLTicketCountsActivity;
 import com.triton.johnson.requestpojo.JobNoListRequest;
 import com.triton.johnson.requestpojo.JohnsonTicketListRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
@@ -110,6 +111,11 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
     private String status = "Open";
     ArrayAdapter<String> spinnerArrayAdapter;
 
+    TextView open_count,inprogress_count,pending_count,completed_count,close_count;
+    LinearLayout openLayout, inprogressLayout, pendingLayout, completeLayout, closeLayout;
+
+
+
 
     @SuppressLint("RestrictedApi")
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -118,6 +124,60 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         Log.w(TAG,"onCreateView--->");
         final View view = inflater.inflate(R.layout.activity_johsnson_login_dashboard_screen, container,
                 false);
+
+        open_count = view.findViewById(R.id.open_count);
+        inprogress_count = view.findViewById(R.id.inprogress_count);
+        pending_count = view.findViewById(R.id.pending_count);
+        completed_count = view.findViewById(R.id.completed_count);
+        close_count = view.findViewById(R.id.close_count);
+
+        openLayout = view.findViewById(R.id.back1);
+        inprogressLayout = view.findViewById(R.id.back2);
+        pendingLayout = view.findViewById(R.id.back3);
+        completeLayout = view.findViewById(R.id.back4);
+        closeLayout = view.findViewById(R.id.back5);
+
+
+        openLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), JohnsonTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Open");
+                startActivity(intent);
+            }
+        });
+        inprogressLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Inprogress");
+                startActivity(intent);
+            }
+        });
+        pendingLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Pending");
+                startActivity(intent);
+            }
+        });
+        completeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Completed");
+                startActivity(intent);
+            }
+        });
+        closeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                intent.putExtra("ticketstatus","Close");
+                startActivity(intent);
+            }
+        });
 
         //private LinearLayout changePasswordLayout;
         SessionManager sessionManager = new SessionManager(getActivity());
@@ -254,37 +314,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
 
         });
-               /* changePasswordLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                new SweetAlertDialog(AdminDepartmentScreen.this, SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText("CMRL")
-                        .setContentText("Do you want to change password?")
-                        .setCancelText("No")
-                        .setConfirmText("Yes")
-                        .showCancelButton(true)
-                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sDialog) {
-
-                                sDialog.dismiss();
-                            }
-                        })
-                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sDialog) {
-
-                                sDialog.dismiss();
-                                Intent intent = new Intent(AdminDepartmentScreen.this, ChangepawwordActivity.class);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.new_right, R.anim.new_left);
-                            }
-                        })
-                        .show();
-
-            }
-        });*/
 
         sideMenuLayout.setOnClickListener(view12 -> JohnshonLoginDashboardActivity.drawerLayout.openDrawer(JohnshonLoginDashboardActivity.nvDrawer));
         retryButton.setOnClickListener(view13 -> {
@@ -315,7 +345,6 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             }
 
         });
-
         emptyImageView.setVisibility(View.GONE);
         retryButton.setVisibility(View.GONE);
         emptyCustomFontTextView.setVisibility(View.GONE);
@@ -420,7 +449,6 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
         refresh();
     }
-
     private void refresh() {
         new Handler().postDelayed(() -> {
             // Refresh the department list to call api again
@@ -435,9 +463,6 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             mWaveSwipeRefreshLayout.setRefreshing(false);
         }, 3000);
     }
-
-
-
     public static class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
         private DepartmentListClass.RecyclerItemClickListener.OnItemClickListener mListener;
 
@@ -475,89 +500,6 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
         }
     }
-
-    /**
-     * @param Url call the api to get the department list
-     */
-    private void DepaartmentUrl(String Url) {
-        Log.w(TAG,"URL:"+"\t"+Url);
-        Log.e("Url", "" + Url);
-        dialog = new Dialog(getActivity(), R.style.NewProgressDialog);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.progroess_popup);
-        dialog.show();
-
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-
-        @SuppressLint("SetTextI18n") JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET, Url, null,
-                response -> {
-                    adminStationListArrayList.clear();
-                    try {
-                        dialog.dismiss();
-                        JSONArray ja = response.getJSONArray("list");
-
-                        for (int i = 0; i < ja.length(); i++) {
-
-                            JSONObject jsonObject = ja.getJSONObject(i);
-                            String status = jsonObject.getString("status");
-                            String message = jsonObject.getString("message");
-                            String id = jsonObject.getString("id");
-                            String station_type = jsonObject.getString("station_type");
-                            String name = jsonObject.getString("station_name");
-                            String open_ticket_count = jsonObject.getString("topen");
-                            String inprogress_ticket_count = jsonObject.getString("tinprogress");
-                            String pending_ticket_count = jsonObject.getString("tpending");
-                            String completed_ticket_count = jsonObject.getString("tcompleted");
-                            String closed_ticket_count = jsonObject.getString("tclosed");
-                            String favourite_status = jsonObject.getString("favourite_status");
-                            String code = jsonObject.getString("code");
-                            adminStationList = new Adminstationlist(status, message, id, code, station_type, name, open_ticket_count, inprogress_ticket_count, pending_ticket_count,
-                                    completed_ticket_count, closed_ticket_count, favourite_status);
-                            adminStationListArrayList.add(adminStationList);
-
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    dialog.dismiss();
-
-                    if (adminStationListArrayList.isEmpty()) {
-
-                        emptyImageView.setVisibility(View.VISIBLE);
-                        retryButton.setVisibility(View.GONE);
-                        emptyCustomFontTextView.setVisibility(View.VISIBLE);
-
-                        emptyImageView.setImageResource(R.mipmap.empty_icon);
-                        emptyCustomFontTextView.setText("No departments");
-
-                    } else {
-
-                        emptyImageView.setVisibility(View.GONE);
-                        retryButton.setVisibility(View.GONE);
-                        emptyCustomFontTextView.setVisibility(View.GONE);
-
-                       /* ticketsListAdapter = new TicketsListAdapter( getActivity(), adminStationListArrayList, id, tabSelects);
-                        mLayoutManager = new LinearLayoutManager(getActivity());
-                        recyclerView.setLayoutManager(mLayoutManager);
-                        recyclerView.setItemAnimator(new DefaultItemAnimator());*/
-
-                        recyclerView.setAdapter(ticketsListAdapter);
-                    }
-                },
-
-                error -> {
-                    Log.w(TAG,"onErrorResponse"+error.toString());
-                    dialog.dismiss();
-                }
-        );
-
-        requestQueue.add(jor);
-
-    }
-
-
     @SuppressLint("LogNotTimber")
     private void StationNameResponseCall() {
         dialog = new Dialog(getActivity(), R.style.NewProgressDialog);
@@ -640,8 +582,6 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         Log.w(TAG,"stationNameRequest "+ new Gson().toJson(stationNameRequest));
         return stationNameRequest;
     }
-
-
     @SuppressLint("LogNotTimber")
     private void JohnSonTicketListResponseCall() {
         dialog = new Dialog(getActivity(), R.style.NewProgressDialog);
@@ -733,7 +673,6 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         Log.w(TAG,"johnsonTicketListRequest "+ new Gson().toJson(johnsonTicketListRequest));
         return johnsonTicketListRequest;
     }
-
     @SuppressLint("LogNotTimber")
     private void JobNoListResponseCall(String stationName_id) {
         dialog = new Dialog(getActivity(), R.style.NewProgressDialog);

@@ -1,6 +1,8 @@
 package com.triton.johnson.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,7 +50,7 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
 
     private String issues, list;
 
-    private FragmentActivity context;
+    private Activity context;
     //    private final LocalDateTime now = LocalDateTime.now().withTime(0, 0, 0, 0);
     private String updateAt;
     private String outTime;
@@ -88,7 +90,7 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
     }
 
 
-    public TicketsListAdapter(FragmentActivity context, List<CMRLTicketListResponse.DataBean> ticketList, String issues, String list) {
+    public TicketsListAdapter(Activity activity, List<CMRLTicketListResponse.DataBean> ticketList, String issues, String list) {
         this.context = context;
         this.ticketList = ticketList;
         this.issues = issues;
