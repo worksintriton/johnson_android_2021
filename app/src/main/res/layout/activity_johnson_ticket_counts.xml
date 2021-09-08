@@ -225,39 +225,7 @@
                 </RelativeLayout>
             </LinearLayout>
             <LinearLayout
-                android:layout_marginTop="10dp"
-                android:id="@+id/ll_station_name"
                 android:layout_below="@+id/ll_ticket_status"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/child_back_ground"
-                android:gravity="center_horizontal"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp">
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp">
-
-                    <Spinner
-                        android:id="@+id/spinner_stationname"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent" />
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_gravity="center"
-                        android:src="@drawable/option"
-                        tools:ignore="ContentDescription" />
-
-                </RelativeLayout>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_below="@+id/ll_station_name"
                 android:layout_marginTop="10dp"
                 android:id="@+id/ll_job_no"
                 android:layout_width="match_parent"
@@ -288,6 +256,39 @@
 
                 </RelativeLayout>
             </LinearLayout>
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:id="@+id/ll_station_name"
+                android:layout_below="@+id/ll_job_no"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/child_back_ground"
+                android:gravity="center_horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp">
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp">
+
+                    <Spinner
+                        android:id="@+id/spinner_stationname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent" />
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:src="@drawable/option"
+                        tools:ignore="ContentDescription" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -296,7 +297,7 @@
                 android:layout_marginRight="20dp"
                 android:weightSum="1.0"
                 android:layout_marginBottom="20dp"
-                android:layout_below="@+id/ll_job_no"
+                android:layout_below="@+id/ll_station_name"
                 android:id="@+id/ll_search_clear"
                 android:layout_marginTop="10dp">
 

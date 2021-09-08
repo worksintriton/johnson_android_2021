@@ -41,6 +41,7 @@ import com.triton.johnson.requestpojo.JobNoListRequest;
 import com.triton.johnson.requestpojo.JohnsonTicketListRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
 import com.triton.johnson.responsepojo.JobNoListResponse;
+import com.triton.johnson.responsepojo.JobNumberResponse;
 import com.triton.johnson.responsepojo.JohnsonTicketListResponse;
 import com.triton.johnson.responsepojo.StationNameResponse;
 import com.triton.johnson.session.SessionManager;
@@ -48,7 +49,6 @@ import com.triton.johnson.utils.ConnectionDetector;
 import com.triton.johnson.utils.RestUtils;
 import com.triton.johnson.view.DepartmentListClass;
 import com.triton.johnson.view.JohnshonLoginDashboardActivity;
-import com.triton.johnson.view.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,7 +80,8 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
     private String id;
     private LinearLayoutManager mLayoutManager;
 
-    private String TAG = "JohnsonLoginDashaboardScreen";
+    private String TAG = "JohnsonTicketCountsActivity";
+    private String ticketstatus;
 
     private  int type = 1;
     private List<StationNameResponse.DataBean> stationNameList = new ArrayList<>();
@@ -93,10 +94,13 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
     private List<JobNoListResponse.DataBean> JobNoList = new ArrayList<>();
     private List<JohnsonTicketListResponse.DataBean> ticketList = new ArrayList<>();
 
-    LinearLayout ll_search,ll_clear,ll_job_no;
+    LinearLayout ll_search,ll_clear,ll_job_no,ll_ticket_status;
     Button btn_search;
     private String status = "Open";
     ArrayAdapter<String> spinnerArrayAdapter;
+    private List<JobNumberResponse.DataBean> elivatorJobNoList = new ArrayList<>();
+    private boolean isClearClick;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +111,13 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
         SessionManager sessionManager = new SessionManager(getApplicationContext());
         HashMap<String, String> hashMap = sessionManager.getUserDetails();
         id = hashMap.get(SessionManager.KEY_EMPID);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            ticketstatus = bundle.getString("ticketstatus");
+            Log.w(TAG,"ticketstatus : "+ticketstatus);
+        }
+
 
         recyclerView = findViewById(R.id.recycler_view);
         emptyCustomFontTextView =  findViewById(R.id.empty_text);
@@ -120,7 +131,7 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
         floatingActionButton =  findViewById(R.id.fab_createevent);
         LinearLayout profileLinearLayout = findViewById(R.id.profile_layout);
         retryButton =  findViewById(R.id.retry_button);
-        LinearLayout sideMenuLayout = findViewById(R.id.back_layout);
+        LinearLayout back_layout = findViewById(R.id.back_layout);
         //changePasswordLayout =  view.findViewById(R.id.change_password);
 
         mWaveSwipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);
@@ -156,8 +167,10 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
 
         spinner_stationname = findViewById(R.id.spinner_stationname);
         ll_job_no = findViewById(R.id.ll_job_no);
+        ll_ticket_status = findViewById(R.id.ll_ticket_status);
+        ll_ticket_status.setVisibility(View.GONE);
         spinner_jobno = findViewById(R.id.spinner_jobno);
-        ll_job_no.setVisibility(View.GONE);
+        ll_job_no.setVisibility(View.VISIBLE);
         spinner_stationname.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int arg2, long arg3) {
@@ -166,11 +179,11 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
                 StationName_id = hashMap_StationId.get(StationName);
                 Log.w(TAG,"StationName : "+StationName+" StationName_id : "+StationName_id);
                 if(StationName_id != null){
-                    ll_job_no.setVisibility(View.VISIBLE);
-                    JobNoListResponseCall(StationName_id);
+                  //  ll_job_no.setVisibility(View.VISIBLE);
+                    //JobNoListResponseCall(StationName_id);
 
                 }else{
-                    ll_job_no.setVisibility(View.GONE);
+                    //ll_job_no.setVisibility(View.GONE);
                     StationName_id = "";
                 }
 
@@ -182,7 +195,6 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
 
             }
         });
-
         spinner_jobno.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int arg2, long arg3) {
@@ -192,6 +204,7 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
                 if(JobName != null && JobName.equalsIgnoreCase("Select Job No")){
                     JobName_id = "";
                 }
+                Log.w(TAG,"spinner_jobno onItemSelected "+" JobName : "+JobName+" JobName_id :"+JobName_id);
 
             }
 
@@ -218,7 +231,8 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
             elvalorLine.setVisibility(View.VISIBLE);
             underLine.setVisibility(View.INVISIBLE);
             //DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id="+id);
-            StationNameResponseCall();
+            //StationNameResponseCall();
+            liftJobNoListResponseCall();
 
         });
         underLayout.setOnClickListener(view2 -> {
@@ -234,13 +248,20 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
             elvalorLine.setVisibility(View.INVISIBLE);
             underLine.setVisibility(View.VISIBLE);
             // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
-            StationNameResponseCall();
+           // StationNameResponseCall();
+            elivatorJobNoListResponseCall();
 
 
         });
 
+        back_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
-        sideMenuLayout.setOnClickListener(view12 -> JohnshonLoginDashboardActivity.drawerLayout.openDrawer(JohnshonLoginDashboardActivity.nvDrawer));
+        //sideMenuLayout.setOnClickListener(view12 -> JohnshonLoginDashboardActivity.drawerLayout.openDrawer(JohnshonLoginDashboardActivity.nvDrawer));
         retryButton.setOnClickListener(view13 -> {
             networkStatus = ConnectionDetector.getConnectivityStatusString(getApplicationContext());
             if (networkStatus.equalsIgnoreCase("Not connected to Internet")) {
@@ -258,11 +279,13 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
                 if (selectStatus.equalsIgnoreCase("0")) {
                     type = 1;
                     // DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
-                    StationNameResponseCall();
+                  //  StationNameResponseCall();
+                    liftJobNoListResponseCall();
                 } else if (selectStatus.equalsIgnoreCase("1")) {
                     // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
                     type = 2;
-                    StationNameResponseCall();
+                    elivatorJobNoListResponseCall();
+                   // StationNameResponseCall();
                 }
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
@@ -294,7 +317,7 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
                 floatingActionButton.setVisibility(View.GONE);
                 tabSelects = "0";
                 type = 1;
-                StationNameResponseCall();
+                liftJobNoListResponseCall();
                 //DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
                 elvalorLine.setVisibility(View.VISIBLE);
                 underLine.setVisibility(View.INVISIBLE);
@@ -304,7 +327,7 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
                 floatingActionButton.setVisibility(View.GONE);
                 tabSelects = "1";
                 type = 2;
-                StationNameResponseCall();
+                elivatorJobNoListResponseCall();
                 // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
                 elvalorLine.setVisibility(View.INVISIBLE);
                 underLine.setVisibility(View.VISIBLE);
@@ -343,14 +366,23 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
         ll_clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.w(TAG,"ll_clear setOnClickListener  : "+"type : "+type);
                 StationName_id = "";
                 JobName_id = "";
-                status = "Open";
+                isClearClick = true;
+                /*status = "Open";
                 String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
                 spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext().getApplicationContext(), R.layout.spinner_item, ticketstatus);
                 spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
-                spinner_ticket_status.setAdapter(spinnerArrayAdapter);
-                JohnSonTicketListResponseCall();
+                spinner_ticket_status.setAdapter(spinnerArrayAdapter);*/
+                if(type ==1){
+                    liftJobNoListResponseCall();
+                }else{
+                    elivatorJobNoListResponseCall();
+                }
+
+
+
             }
         });
 
@@ -456,10 +488,10 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
     }
     @SuppressLint("LogNotTimber")
     private void StationNameResponseCall() {
-        dialog = new Dialog(JohnsonTicketCountsActivity.this, R.style.NewProgressDialog);
+        /*dialog = new Dialog(JohnsonTicketCountsActivity.this, R.style.NewProgressDialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.progroess_popup);
-        dialog.show();
+        dialog.show();*/
 
         APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
         Call<StationNameResponse> call = apiInterface.StationNameResponseCall(RestUtils.getContentType(), stationNameRequest(type));
@@ -615,14 +647,11 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
          * job_id : 61151dbaac7f9e21e2963133
          * status :
          */
-
-
-
         JohnsonTicketListRequest johnsonTicketListRequest = new JohnsonTicketListRequest();
         johnsonTicketListRequest.setType(String.valueOf(type));
         johnsonTicketListRequest.setStation_id(StationName_id);
         johnsonTicketListRequest.setJob_id(JobName_id);
-        johnsonTicketListRequest.setStatus(status);
+        johnsonTicketListRequest.setStatus(ticketstatus);
         Log.w(TAG,"johnsonTicketListRequest "+ new Gson().toJson(johnsonTicketListRequest));
         return johnsonTicketListRequest;
     }
@@ -701,5 +730,123 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
         Log.w(TAG,"jobNoListRequest "+ new Gson().toJson(jobNoListRequest));
         return jobNoListRequest;
     }
+
+
+    @SuppressLint("LogNotTimber")
+    public void elivatorJobNoListResponseCall(){
+        dialog = new Dialog(JohnsonTicketCountsActivity.this, R.style.NewProgressDialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.progroess_popup);
+        dialog.show();
+        //Creating an object of our api interface
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<JobNumberResponse> call = apiInterface.elivatorJobNoListResponseCall(RestUtils.getContentType());
+        Log.w(TAG,"elivatorJobNoListResponseCall url  :%s"+ call.request().url().toString());
+
+        call.enqueue(new Callback<JobNumberResponse>() {
+            @SuppressLint("LogNotTimber")
+            @Override
+            public void onResponse(@NonNull Call<JobNumberResponse> call, @NonNull Response<JobNumberResponse> response) {
+               // dialog.dismiss();
+                if (response.body() != null) {
+                    if(200 == response.body().getCode()){
+                        StationNameResponseCall();
+
+                        elivatorJobNoList.clear();
+                        Log.w(TAG,"JobNumberResponse" + new Gson().toJson(response.body()));
+
+                        if(response.body().getData() != null && response.body().getData().size()>0){
+                            elivatorJobNoList = response.body().getData();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }else{
+                            elivatorJobNoList.clear();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }
+                    }
+
+
+
+                }
+
+            }
+
+
+            @Override
+            public void onFailure(@NonNull Call<JobNumberResponse> call,@NonNull  Throwable t) {
+                dialog.dismiss();
+                Log.w(TAG,"JobNumberResponse flr"+t.getMessage());
+            }
+        });
+
+    }
+    public void liftJobNoListResponseCall(){
+        dialog = new Dialog(JohnsonTicketCountsActivity.this, R.style.NewProgressDialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.progroess_popup);
+        dialog.show();
+        //Creating an object of our api interface
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<JobNumberResponse> call = apiInterface.liftJobNoListResponseCall(RestUtils.getContentType());
+        Log.w(TAG,"liftJobNoListResponseCall url  :%s"+ call.request().url().toString());
+
+        call.enqueue(new Callback<JobNumberResponse>() {
+            @SuppressLint("LogNotTimber")
+            @Override
+            public void onResponse(@NonNull Call<JobNumberResponse> call, @NonNull Response<JobNumberResponse> response) {
+
+                if (response.body() != null) {
+                    if(200 == response.body().getCode()){
+                        StationNameResponseCall();
+
+                        elivatorJobNoList.clear();
+                        Log.w(TAG,"liftJobNoListResponseCall" + new Gson().toJson(response.body()));
+
+                        if(response.body().getData() != null && response.body().getData().size()>0){
+                            elivatorJobNoList = response.body().getData();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }else{
+                            elivatorJobNoList.clear();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }
+                    }
+
+
+
+                }
+
+            }
+
+
+            @Override
+            public void onFailure(@NonNull Call<JobNumberResponse> call,@NonNull  Throwable t) {
+                dialog.dismiss();
+                Log.w(TAG,"liftJobNoListResponseCall flr"+t.getMessage());
+            }
+        });
+
+    }
+    private void setElivatorJobNoList(List<JobNumberResponse.DataBean> elivatorJobNoList) {
+        if (elivatorJobNoList != null && elivatorJobNoList.size() > 0) {
+            ArrayList<String> JobNoArrayList = new ArrayList<>();
+            JobNoArrayList.add("Select JoB No");
+            for (int i = 0; i < elivatorJobNoList.size(); i++) {
+                String JobNo = elivatorJobNoList.get(i).getJob_no();
+                hashMap_JobNoId.put(elivatorJobNoList.get(i).getJob_no(), elivatorJobNoList.get(i).get_id());
+                JobNoArrayList.add(JobNo);
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item, JobNoArrayList);
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+                spinner_jobno.setAdapter(spinnerArrayAdapter);
+            }
+        }
+        else {
+            ArrayList<String> JobNoArrayList = new ArrayList<>();
+            JobNoArrayList.add("Select JoB No");
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item, JobNoArrayList);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+            spinner_jobno.setAdapter(spinnerArrayAdapter);
+
+        }
+    }
+
 
 }

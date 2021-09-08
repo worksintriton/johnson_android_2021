@@ -14,6 +14,7 @@ public class JohnsonTicketListRequest {
     private String job_id;
     private String status;
 
+
     public String getStatus() {
         return status;
     }

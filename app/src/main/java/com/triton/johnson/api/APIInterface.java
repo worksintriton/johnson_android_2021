@@ -4,6 +4,7 @@ import com.triton.johnson.model.ImageUploadResponse;
 import com.triton.johnson.requestpojo.AttendanceCreateRequest;
 import com.triton.johnson.requestpojo.CMRLTicketListRequest;
 import com.triton.johnson.requestpojo.CheckAttendanceRequest;
+import com.triton.johnson.requestpojo.CmrlDashboardCountRequest;
 import com.triton.johnson.requestpojo.FaultTypeListRequest;
 import com.triton.johnson.requestpojo.JobNoListRequest;
 import com.triton.johnson.requestpojo.JohnsonTicketListRequest;
@@ -15,8 +16,10 @@ import com.triton.johnson.requestpojo.UpdateIsuesStatusRequest;
 import com.triton.johnson.requestpojo.ViewTicketsRequest;
 import com.triton.johnson.responsepojo.CMRLTicketListResponse;
 import com.triton.johnson.responsepojo.CheckAttendanceResponse;
+import com.triton.johnson.responsepojo.CmrlDashboardCountResponse;
 import com.triton.johnson.responsepojo.FaultTypeListResponse;
 import com.triton.johnson.responsepojo.JobNoListResponse;
+import com.triton.johnson.responsepojo.JobNumberResponse;
 import com.triton.johnson.responsepojo.JohnsonTicketListResponse;
 import com.triton.johnson.responsepojo.LoginResponse;
 import com.triton.johnson.responsepojo.ServingLevelListResponse;
@@ -27,6 +30,7 @@ import com.triton.johnson.responsepojo.ViewTicketsResponse;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -96,9 +100,26 @@ public interface APIInterface {
     Call<SuccessResponse> AttendanceCreateRequestCall(@Header("Content-Type") String type, @Body AttendanceCreateRequest attendanceCreateRequest);
 
 
+    /*cmrl_dashboard_count*/
+    @POST("ticket/cmrl_dashboard_count")
+    Call<CmrlDashboardCountResponse> CmrlDashboardCountRequestCall(@Header("Content-Type") String type, @Body CmrlDashboardCountRequest cmrlDashboardCountRequest);
+
+   /*johnson_dashboard_count*/
+    @POST("ticket/johnson_dashboard_count")
+    Call<CmrlDashboardCountResponse> JohnsonDashboardCountRequestCall(@Header("Content-Type") String type, @Body CmrlDashboardCountRequest cmrlDashboardCountRequest);
+
+
     @Multipart
     @POST("upload")
     Call<ImageUploadResponse> getImageStroeResponse(@Part MultipartBody.Part file);
+
+    /*elivators job_no list*/
+    @GET("job_no/get_jobno/elivator")
+    Call<JobNumberResponse> elivatorJobNoListResponseCall(@Header("Content-Type") String type);
+
+    /*lift job_no list*/
+    @GET("job_no/get_jobno/lift")
+    Call<JobNumberResponse> liftJobNoListResponseCall(@Header("Content-Type") String type);
 
 
 }

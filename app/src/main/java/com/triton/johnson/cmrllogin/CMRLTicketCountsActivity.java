@@ -10,9 +10,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
+
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -20,7 +19,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,19 +38,19 @@ import com.triton.johnson.arraylist.StationList;
 import com.triton.johnson.requestpojo.CMRLTicketListRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
 import com.triton.johnson.responsepojo.CMRLTicketListResponse;
+import com.triton.johnson.responsepojo.JobNumberResponse;
+import com.triton.johnson.responsepojo.JohnsonTicketListResponse;
 import com.triton.johnson.responsepojo.StationNameResponse;
 import com.triton.johnson.session.SessionManager;
 import com.triton.johnson.utils.ConnectionDetector;
 import com.triton.johnson.utils.RestUtils;
-import com.triton.johnson.view.AddNewTicketActivity;
 import com.triton.johnson.view.CmrlLoginDashboardActivity;
 import com.triton.johnson.view.DepartmentListClass;
-import com.triton.johnson.view.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+
 
 import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
@@ -89,17 +87,16 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
     private List<CMRLTicketListResponse.DataBean> ticketList = new ArrayList<>();
     private List<StationNameResponse.DataBean> stationNameList = new ArrayList<>();
     HashMap<String, String> hashMap_StationId = new HashMap<>();
+    HashMap<String, String> hashMap_JoBNoId = new HashMap<>();
     Spinner spinner_ticket_status, spinner_stationname;
     private String StationName;
 
-    private String status = "Open";
     ArrayAdapter<String> spinnerArrayAdapter;
     LinearLayout ll_search,ll_clear;
     Button btn_search;
-
-    TextView open_count,inprogress_count,pending_count,completed_count,close_count;
-    LinearLayout openLayout, inprogressLayout, pendingLayout, completeLayout, closeLayout;
-
+    private List<JobNumberResponse.DataBean> elivatorJobNoList = new ArrayList<>();
+    private String JobNo = "";
+    private String Job_id = "";
 
 
     @Override
@@ -134,7 +131,6 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
         ImageView img_new_ticket = findViewById(R.id.img_new_ticket);
         ImageView img_profile = findViewById(R.id.img_profile);
         retryButton =  findViewById(R.id.retry_button);
-        LinearLayout sideMenuLayout = findViewById(R.id.back_layout);
         //changePasswordLayout =  view.findViewById(R.id.change_password);
 
         mWaveSwipeRefreshLayout.setColorSchemeColors(Color.WHITE, Color.WHITE);
@@ -146,7 +142,7 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
 
         spinner_ticket_status = findViewById(R.id.spinner_ticket_status);
 
-        String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
+      /*  String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
         spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext().getApplicationContext(), R.layout.spinner_item, ticketstatus);
 
         spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
@@ -165,6 +161,7 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
 
             }
         });
+*/
 
         spinner_stationname = findViewById(R.id.spinner_stationname);
         spinner_stationname.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -180,6 +177,26 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
                 }else{
                     StationName_id = "";
                 }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        spinner_ticket_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int arg2, long arg3) {
+                ((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.black));
+                JobNo = spinner_ticket_status.getSelectedItem().toString();
+                Job_id = hashMap_JoBNoId.get(JobNo);
+                Log.w(TAG,"JobNo : "+JobNo+" Job_id : "+Job_id);
+                if(Job_id == null){
+                    Job_id = "";
+                }
+
 
             }
 
@@ -211,12 +228,21 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
             @Override
             public void onClick(View view) {
                 StationName_id = "";
-                status = "Open";
-                String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
+                if(type ==1){
+                    liftJobNoListResponseCall();
+                }else{
+                    elivatorJobNoListResponseCall();
+                }
+
+
+
+
+                /*String[] ticketstatus = {"Open","Inprogress","Pending","Completed","Close"};
                 spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext().getApplicationContext(), R.layout.spinner_item, ticketstatus);
                 spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
-                spinner_ticket_status.setAdapter(spinnerArrayAdapter);
-                StationNameResponseCall();
+                spinner_ticket_status.setAdapter(spinnerArrayAdapter);*/
+
+
             }
         });
 
@@ -226,11 +252,12 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
             StationName_id = "";
             elvalorLine.setVisibility(View.VISIBLE);
             underLine.setVisibility(View.INVISIBLE);
-            status = "Open";
+          /*  status = "Open";
             spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext().getApplicationContext(), R.layout.spinner_item, ticketstatus);
             spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
             spinner_ticket_status.setAdapter(spinnerArrayAdapter);
-            StationNameResponseCall();
+            StationNameResponseCall();*/
+            liftJobNoListResponseCall();
 
         });
         underLayout.setOnClickListener(view2 -> {
@@ -239,17 +266,16 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
             StationName_id = "";
             elvalorLine.setVisibility(View.INVISIBLE);
             underLine.setVisibility(View.VISIBLE);
-            status = "Open";
+          /*  status = "Open";
             spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext().getApplicationContext(), R.layout.spinner_item, ticketstatus);
             spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
-            spinner_ticket_status.setAdapter(spinnerArrayAdapter);
-            StationNameResponseCall();
+            spinner_ticket_status.setAdapter(spinnerArrayAdapter);*/
+            elivatorJobNoListResponseCall();
 
 
         });
 
-
-        sideMenuLayout.setOnClickListener(view12 -> CmrlLoginDashboardActivity.drawerLayout.openDrawer(CmrlLoginDashboardActivity.nvDrawer));
+        //sideMenuLayout.setOnClickListener(view12 -> CmrlLoginDashboardActivity.drawerLayout.openDrawer(CmrlLoginDashboardActivity.nvDrawer));
         retryButton.setOnClickListener(view13 -> {
             networkStatus = ConnectionDetector.getConnectivityStatusString(getApplicationContext());
             if (networkStatus.equalsIgnoreCase("Not connected to Internet")) {
@@ -263,14 +289,17 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
                 emptyCustomFontTextView.setText(R.string.pleasecheckyourinternet);
                 floatingActionButton.setVisibility(View.GONE);
             } else {
+                Log.w(TAG,"selectStatus : "+selectStatus);
                 if (selectStatus.equalsIgnoreCase("0")) {
                     //CMRLTicketListResponseCall();
                     //DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
-                    StationNameResponseCall();
+
+                    liftJobNoListResponseCall();
                 } else if (selectStatus.equalsIgnoreCase("1")) {
                     //DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
                     // CMRLTicketListResponseCall();
-                    StationNameResponseCall();
+                   // StationNameResponseCall();
+                    elivatorJobNoListResponseCall();
                 }
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
@@ -304,7 +333,8 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
                 type =1;
                 // DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
                 // CMRLTicketListResponseCall();
-                StationNameResponseCall();
+               // StationNameResponseCall();
+                liftJobNoListResponseCall();
                 elvalorLine.setVisibility(View.VISIBLE);
                 underLine.setVisibility(View.INVISIBLE);
             }
@@ -314,7 +344,8 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
                 type =2;
                 //DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
                 // CMRLTicketListResponseCall();
-                StationNameResponseCall();
+               // StationNameResponseCall();
+                elivatorJobNoListResponseCall();
                 elvalorLine.setVisibility(View.INVISIBLE);
                 underLine.setVisibility(View.VISIBLE);
             }
@@ -330,22 +361,12 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
             }
         });
 
-
-
-
-
-
-
-
-
-
         back_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onBackPressed();
             }
         });
-
 
     }
 
@@ -356,7 +377,6 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
 
     @Override
     public void onRefresh() {
-
         refresh();
     }
     private void refresh() {
@@ -373,9 +393,6 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
             mWaveSwipeRefreshLayout.setRefreshing(false);
         }, 3000);
     }
-
-
-
     public static class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
         private DepartmentListClass.RecyclerItemClickListener.OnItemClickListener mListener;
 
@@ -413,8 +430,6 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
 
         }
     }
-
-
 
     @SuppressLint("LogNotTimber")
     private void CMRLTicketListResponseCall() {
@@ -493,22 +508,25 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
          * type : 1
          * station_id : 611510c34f912e1856fc6d44
          * break_down_reported_by : 6113acf26ee293224d81081c
+         * status
+         * job_id
          */
         CMRLTicketListRequest cmrlTicketListRequest = new CMRLTicketListRequest();
         cmrlTicketListRequest.setStation_id(StationName_id);
         cmrlTicketListRequest.setBreak_down_reported_by(id);
         cmrlTicketListRequest.setType(String.valueOf(type));
-        cmrlTicketListRequest.setStatus(status);
+        cmrlTicketListRequest.setStatus(ticketstatus);
+        cmrlTicketListRequest.setJob_id(Job_id);
         Log.w(TAG,"cmrlTicketListRequest "+ new Gson().toJson(cmrlTicketListRequest));
         return cmrlTicketListRequest;
     }
 
     @SuppressLint("LogNotTimber")
     private void StationNameResponseCall() {
-        dialog = new Dialog(CMRLTicketCountsActivity.this, R.style.NewProgressDialog);
+       /* dialog = new Dialog(CMRLTicketCountsActivity.this, R.style.NewProgressDialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.progroess_popup);
-        dialog.show();
+        dialog.show();*/
 
         APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
         Call<StationNameResponse> call = apiInterface.StationNameResponseCall(RestUtils.getContentType(), stationNameRequest(type));
@@ -564,7 +582,8 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
                 spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
                 spinner_stationname.setAdapter(spinnerArrayAdapter);
             }
-        } else {
+        }
+        else {
             ArrayList<String> StationArrayList = new ArrayList<>();
             StationArrayList.add("Select Station Name");
             ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item, StationArrayList);
@@ -584,6 +603,122 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
 
         Log.w(TAG,"stationNameRequest "+ new Gson().toJson(stationNameRequest));
         return stationNameRequest;
+    }
+
+    @SuppressLint("LogNotTimber")
+    public void elivatorJobNoListResponseCall(){
+        dialog = new Dialog(CMRLTicketCountsActivity.this, R.style.NewProgressDialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.progroess_popup);
+        dialog.show();
+        //Creating an object of our api interface
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<JobNumberResponse> call = apiInterface.elivatorJobNoListResponseCall(RestUtils.getContentType());
+        Log.w(TAG,"elivatorJobNoListResponseCall url  :%s"+ call.request().url().toString());
+
+        call.enqueue(new Callback<JobNumberResponse>() {
+            @SuppressLint("LogNotTimber")
+            @Override
+            public void onResponse(@NonNull Call<JobNumberResponse> call, @NonNull Response<JobNumberResponse> response) {
+             // dialog.dismiss();
+              if (response.body() != null) {
+                    if(200 == response.body().getCode()){
+                        StationNameResponseCall();
+
+                        elivatorJobNoList.clear();
+                        Log.w(TAG,"JobNumberResponse" + new Gson().toJson(response.body()));
+
+                        if(response.body().getData() != null && response.body().getData().size()>0){
+                            elivatorJobNoList = response.body().getData();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }else{
+                            elivatorJobNoList.clear();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }
+                    }
+
+
+
+                }
+
+            }
+
+
+            @Override
+            public void onFailure(@NonNull Call<JobNumberResponse> call,@NonNull  Throwable t) {
+                dialog.dismiss();
+                Log.w(TAG,"JobNumberResponse flr"+t.getMessage());
+            }
+        });
+
+    }
+    public void liftJobNoListResponseCall(){
+        dialog = new Dialog(CMRLTicketCountsActivity.this, R.style.NewProgressDialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.progroess_popup);
+        dialog.show();
+        //Creating an object of our api interface
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<JobNumberResponse> call = apiInterface.liftJobNoListResponseCall(RestUtils.getContentType());
+        Log.w(TAG,"liftJobNoListResponseCall url  :%s"+ call.request().url().toString());
+
+        call.enqueue(new Callback<JobNumberResponse>() {
+            @SuppressLint("LogNotTimber")
+            @Override
+            public void onResponse(@NonNull Call<JobNumberResponse> call, @NonNull Response<JobNumberResponse> response) {
+
+                if (response.body() != null) {
+                    if(200 == response.body().getCode()){
+                        StationNameResponseCall();
+
+                        elivatorJobNoList.clear();
+                        Log.w(TAG,"liftJobNoListResponseCall" + new Gson().toJson(response.body()));
+
+                        if(response.body().getData() != null && response.body().getData().size()>0){
+                            elivatorJobNoList = response.body().getData();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }else{
+                            elivatorJobNoList.clear();
+                            setElivatorJobNoList(elivatorJobNoList);
+                        }
+                    }
+
+
+
+                }
+
+            }
+
+
+            @Override
+            public void onFailure(@NonNull Call<JobNumberResponse> call,@NonNull  Throwable t) {
+                dialog.dismiss();
+                Log.w(TAG,"liftJobNoListResponseCall flr"+t.getMessage());
+            }
+        });
+
+    }
+    private void setElivatorJobNoList(List<JobNumberResponse.DataBean> elivatorJobNoList) {
+        if (elivatorJobNoList != null && elivatorJobNoList.size() > 0) {
+            ArrayList<String> JobNoArrayList = new ArrayList<>();
+            JobNoArrayList.add("Select JoB No");
+            for (int i = 0; i < elivatorJobNoList.size(); i++) {
+                String JobNo = elivatorJobNoList.get(i).getJob_no();
+                hashMap_JoBNoId.put(elivatorJobNoList.get(i).getJob_no(), elivatorJobNoList.get(i).get_id());
+                JobNoArrayList.add(JobNo);
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item, JobNoArrayList);
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+                spinner_ticket_status.setAdapter(spinnerArrayAdapter);
+            }
+        }
+        else {
+            ArrayList<String> JobNoArrayList = new ArrayList<>();
+            JobNoArrayList.add("Select JoB No");
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item, JobNoArrayList);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
+            spinner_ticket_status.setAdapter(spinnerArrayAdapter);
+
+        }
     }
 
 

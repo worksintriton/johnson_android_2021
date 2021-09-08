@@ -4,7 +4,7 @@
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EAEAEA">
+    android:background="#FFFFFF">
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -106,7 +106,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#EAEAEA"
+        android:background="#FFFFFF"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -197,7 +197,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="5dp"
-                android:background="#EAEAEA">
+                android:background="#FFFFFF">
                 <LinearLayout
                     android:layout_marginTop="20dp"
                     android:id="@+id/ll_ticket_status"
@@ -467,6 +467,7 @@
                         android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/ll_open"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:background="@drawable/shape"
@@ -492,7 +493,7 @@
                             android:layout_height="5dp"></LinearLayout>
 
                         <TextView
-                            android:id="@+id/title"
+                            android:id="@+id/txt_lbl_open"
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -521,6 +522,7 @@
                         android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/ll_inprogress"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:background="@drawable/shape"
@@ -546,7 +548,7 @@
                             android:layout_height="5dp"></LinearLayout>
 
                         <TextView
-                            android:id="@+id/inprogress"
+                            android:id="@+id/txt_lbl_inprogres"
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -574,6 +576,7 @@
                         android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/ll_pending"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:background="@drawable/shape"
@@ -599,7 +602,7 @@
                             android:layout_height="5dp"></LinearLayout>
 
                         <TextView
-                            android:id="@+id/pending"
+                            android:id="@+id/txt_lbl_pending"
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -627,6 +630,7 @@
                         android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/ll_complete"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:background="@drawable/shape"
@@ -652,7 +656,7 @@
                             android:layout_height="5dp"></LinearLayout>
 
                         <TextView
-                            android:id="@+id/progress"
+                            android:id="@+id/txt_lbl_completed"
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -680,6 +684,7 @@
                         android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/ll_close"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:background="@drawable/shape"
@@ -705,7 +710,7 @@
                             android:layout_height="5dp"></LinearLayout>
 
                         <TextView
-                            android:id="@+id/close"
+                            android:id="@+id/txt_lbl_close"
                             style="@style/TextAppearance.AppCompat.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

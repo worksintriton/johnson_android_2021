@@ -6,12 +6,23 @@ public class CMRLTicketListRequest {
      * type : 1
      * station_id : 611510c34f912e1856fc6d44
      * break_down_reported_by : 6113acf26ee293224d81081c
+     * status
+     * job_id
      */
 
     private String type;
     private String station_id;
     private String break_down_reported_by;
     private String status;
+    private String job_id;
+
+    public String getJob_id() {
+        return job_id;
+    }
+
+    public void setJob_id(String job_id) {
+        this.job_id = job_id;
+    }
 
     public String getStatus() {
         return status;

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -30,10 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.triton.johnson.R;
@@ -42,10 +40,11 @@ import com.triton.johnson.api.APIInterface;
 
 import com.triton.johnson.api.RetrofitClient;
 import com.triton.johnson.arraylist.Adminstationlist;
-import com.triton.johnson.cmrllogin.CMRLTicketCountsActivity;
+import com.triton.johnson.requestpojo.CmrlDashboardCountRequest;
 import com.triton.johnson.requestpojo.JobNoListRequest;
 import com.triton.johnson.requestpojo.JohnsonTicketListRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
+import com.triton.johnson.responsepojo.CmrlDashboardCountResponse;
 import com.triton.johnson.responsepojo.JobNoListResponse;
 import com.triton.johnson.responsepojo.JohnsonTicketListResponse;
 import com.triton.johnson.responsepojo.StationNameResponse;
@@ -55,11 +54,6 @@ import com.triton.johnson.utils.RestUtils;
 import com.triton.johnson.view.JohnshonLoginDashboardActivity;
 import com.triton.johnson.view.DepartmentListClass;
 import com.triton.johnson.view.ProfileActivity;
-import com.triton.johnson.view.UpdateStatusActivity;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,10 +105,16 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
     private String status = "Open";
     ArrayAdapter<String> spinnerArrayAdapter;
 
-    TextView open_count,inprogress_count,pending_count,completed_count,close_count;
+    TextView txt_open_count,txt_inprogress_count,txt_pending_count,txt_completed_count,txt_close_count;
+    TextView txt_lbl_open,txt_lbl_inprogres,txt_lbl_pending,txt_lbl_completed,txt_lbl_close;
     LinearLayout openLayout, inprogressLayout, pendingLayout, completeLayout, closeLayout;
+    LinearLayout ll_open,ll_inprogress,ll_pending,ll_complete,ll_close;
 
-
+    private int open_count;
+    private int inprogress_count;
+    private int pending_count;
+    private int completed_count;
+    private int close_count;
 
 
     @SuppressLint("RestrictedApi")
@@ -125,11 +125,17 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         final View view = inflater.inflate(R.layout.activity_johsnson_login_dashboard_screen, container,
                 false);
 
-        open_count = view.findViewById(R.id.open_count);
-        inprogress_count = view.findViewById(R.id.inprogress_count);
-        pending_count = view.findViewById(R.id.pending_count);
-        completed_count = view.findViewById(R.id.completed_count);
-        close_count = view.findViewById(R.id.close_count);
+        txt_open_count = view.findViewById(R.id.open_count);
+        txt_inprogress_count = view.findViewById(R.id.inprogress_count);
+        txt_pending_count = view.findViewById(R.id.pending_count);
+        txt_completed_count = view.findViewById(R.id.completed_count);
+        txt_close_count = view.findViewById(R.id.close_count);
+
+        txt_lbl_open = view.findViewById(R.id.txt_lbl_open);
+        txt_lbl_inprogres = view.findViewById(R.id.txt_lbl_inprogres);
+        txt_lbl_pending = view.findViewById(R.id.txt_lbl_pending);
+        txt_lbl_completed = view.findViewById(R.id.txt_lbl_completed);
+        txt_lbl_close = view.findViewById(R.id.txt_lbl_close);
 
         openLayout = view.findViewById(R.id.back1);
         inprogressLayout = view.findViewById(R.id.back2);
@@ -137,47 +143,14 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         completeLayout = view.findViewById(R.id.back4);
         closeLayout = view.findViewById(R.id.back5);
 
+        ll_open = view.findViewById(R.id.ll_open);
+        ll_inprogress = view.findViewById(R.id.ll_inprogress);
+        ll_pending = view.findViewById(R.id.ll_pending);
+        ll_complete = view.findViewById(R.id.ll_complete);
+        ll_close = view.findViewById(R.id.ll_close);
 
-        openLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), JohnsonTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Open");
-                startActivity(intent);
-            }
-        });
-        inprogressLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Inprogress");
-                startActivity(intent);
-            }
-        });
-        pendingLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Pending");
-                startActivity(intent);
-            }
-        });
-        completeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Completed");
-                startActivity(intent);
-            }
-        });
-        closeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Close");
-                startActivity(intent);
-            }
-        });
+
+      
 
         //private LinearLayout changePasswordLayout;
         SessionManager sessionManager = new SessionManager(getActivity());
@@ -334,11 +307,11 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                 if (selectStatus.equalsIgnoreCase("0")) {
                     type = 1;
                    // DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
-                    StationNameResponseCall();
+                    JohnsonDashboardCountRequestCall();
                 } else if (selectStatus.equalsIgnoreCase("1")) {
                    // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
                     type = 2;
-                    StationNameResponseCall();
+                    JohnsonDashboardCountRequestCall();
                 }
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
@@ -370,7 +343,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                 floatingActionButton.setVisibility(View.GONE);
                 tabSelects = "0";
                 type = 1;
-                StationNameResponseCall();
+                JohnsonDashboardCountRequestCall();
                 //DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
                 elvalorLine.setVisibility(View.VISIBLE);
                 underLine.setVisibility(View.INVISIBLE);
@@ -380,7 +353,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                 floatingActionButton.setVisibility(View.GONE);
                 tabSelects = "1";
                 type = 2;
-                StationNameResponseCall();
+                JohnsonDashboardCountRequestCall();
                // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
                 elvalorLine.setVisibility(View.INVISIBLE);
                 underLine.setVisibility(View.VISIBLE);
@@ -747,6 +720,137 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         jobNoListRequest.setStation_id(stationName_id);
         Log.w(TAG,"jobNoListRequest "+ new Gson().toJson(jobNoListRequest));
         return jobNoListRequest;
+    }
+
+
+    @SuppressLint({"LogNotTimber", "UseRequireInsteadOfGet"})
+    private void JohnsonDashboardCountRequestCall() {
+        dialog = new Dialog(Objects.requireNonNull(getActivity()), R.style.NewProgressDialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.progroess_popup);
+        dialog.show();
+
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<CmrlDashboardCountResponse> call = apiInterface.JohnsonDashboardCountRequestCall(RestUtils.getContentType(), cmrlDashboardCountRequest());
+        Log.w(TAG,"JohnsonDashboardCountRequestCall url  :%s"+" "+ call.request().url().toString());
+
+        call.enqueue(new Callback<CmrlDashboardCountResponse>() {
+            @SuppressLint({"LogNotTimber", "SetTextI18n"})
+            @Override
+            public void onResponse(@NonNull Call<CmrlDashboardCountResponse> call, @NonNull Response<CmrlDashboardCountResponse> response) {
+                dialog.dismiss();
+                Log.w(TAG,"JohnsonDashboardCountRequestCall" + new Gson().toJson(response.body()));
+                if (response.body() != null) {
+
+                    if (200 == response.body().getCode()) {
+                        if(response.body().getData() != null){
+                            open_count = response.body().getData().getOpen_count();
+                            inprogress_count = response.body().getData().getInprogress_count();
+                            pending_count = response.body().getData().getPending_count();
+                            completed_count = response.body().getData().getCompleted_count();
+                            close_count = response.body().getData().getClose_count();
+
+                            txt_open_count.setText(response.body().getData().getOpen_count()+"");
+                            txt_inprogress_count.setText(response.body().getData().getInprogress_count()+"");
+                            txt_pending_count.setText(response.body().getData().getPending_count()+"");
+                            txt_completed_count.setText(response.body().getData().getCompleted_count()+"");
+                            txt_close_count.setText(response.body().getData().getClose_count()+"");
+
+
+                            if(open_count != 0){
+                                openLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Open");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{
+                                ll_open.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_open.setTextColor(Color.parseColor("#dddddd"));
+                            }
+                            if(inprogress_count != 0){
+                                inprogressLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Inprogress");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{ ll_inprogress.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_inprogres.setTextColor(Color.parseColor("#dddddd"));}
+                            if(pending_count != 0){
+                                pendingLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Pending");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{
+                                ll_pending.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_pending.setTextColor(Color.parseColor("#dddddd"));
+                            }
+                            if(completed_count != 0){
+                                completeLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Completed");
+                                        startActivity(intent);
+                                    }
+                                });
+                            } else{
+                                ll_complete.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_completed.setTextColor(Color.parseColor("#dddddd"));
+                            }
+                            if(close_count != 0) {
+                                closeLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), JohnsonTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus", "Close");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{ ll_close.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_close.setTextColor(Color.parseColor("#dddddd"));}
+
+
+                        }
+
+
+
+                    }
+
+                }
+            }
+
+            @SuppressLint("LongLogTag")
+            @Override
+            public void onFailure(@NonNull Call<CmrlDashboardCountResponse> call,@NonNull Throwable t) {
+                dialog.dismiss();
+                Log.w("CMRLTicketListResponse flr", "--->" + t.getMessage());
+
+            }
+        });
+
+    }
+    private CmrlDashboardCountRequest cmrlDashboardCountRequest() {
+
+
+        /*
+         * break_down_reported_by : 611ba6d611fce741ad463bc7
+         */
+
+        CmrlDashboardCountRequest cmrlDashboardCountRequest = new CmrlDashboardCountRequest();
+        cmrlDashboardCountRequest.setBreak_down_reported_by("");
+
+        Log.w(TAG,"cmrlDashboardCountRequest "+ new Gson().toJson(cmrlDashboardCountRequest));
+        return cmrlDashboardCountRequest;
     }
 
 

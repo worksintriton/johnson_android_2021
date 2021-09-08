@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -37,9 +38,12 @@ import com.triton.johnson.adapter.TicketsListAdapter;
 import com.triton.johnson.api.APIInterface;
 import com.triton.johnson.api.RetrofitClient;
 import com.triton.johnson.arraylist.StationList;
+import com.triton.johnson.requestpojo.AttendanceCreateRequest;
 import com.triton.johnson.requestpojo.CMRLTicketListRequest;
+import com.triton.johnson.requestpojo.CmrlDashboardCountRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
 import com.triton.johnson.responsepojo.CMRLTicketListResponse;
+import com.triton.johnson.responsepojo.CmrlDashboardCountResponse;
 import com.triton.johnson.responsepojo.StationNameResponse;
 import com.triton.johnson.session.SessionManager;
 import com.triton.johnson.utils.ConnectionDetector;
@@ -52,6 +56,7 @@ import com.triton.johnson.view.ProfileActivity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 
 import es.dmoral.toasty.Toasty;
@@ -97,8 +102,16 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
     LinearLayout ll_search,ll_clear;
     Button btn_search;
 
-    TextView open_count,inprogress_count,pending_count,completed_count,close_count;
+    TextView txt_open_count,txt_inprogress_count,txt_pending_count,txt_completed_count,txt_close_count;
+    TextView txt_lbl_open,txt_lbl_inprogres,txt_lbl_pending,txt_lbl_completed,txt_lbl_close;
     LinearLayout openLayout, inprogressLayout, pendingLayout, completeLayout, closeLayout;
+    LinearLayout ll_open,ll_inprogress,ll_pending,ll_complete,ll_close;
+
+    private int open_count;
+    private int inprogress_count;
+    private int pending_count;
+    private int completed_count;
+    private int close_count;
 
 
 
@@ -115,11 +128,17 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         HashMap<String, String> hashMap = sessionManager.getUserDetails();
         id = hashMap.get(SessionManager.KEY_ID);
 
-        open_count = view.findViewById(R.id.open_count);
-        inprogress_count = view.findViewById(R.id.inprogress_count);
-        pending_count = view.findViewById(R.id.pending_count);
-        completed_count = view.findViewById(R.id.completed_count);
-        close_count = view.findViewById(R.id.close_count);
+        txt_open_count = view.findViewById(R.id.open_count);
+        txt_inprogress_count = view.findViewById(R.id.inprogress_count);
+        txt_pending_count = view.findViewById(R.id.pending_count);
+        txt_completed_count = view.findViewById(R.id.completed_count);
+        txt_close_count = view.findViewById(R.id.close_count);
+
+        txt_lbl_open = view.findViewById(R.id.txt_lbl_open);
+        txt_lbl_inprogres = view.findViewById(R.id.txt_lbl_inprogres);
+        txt_lbl_pending = view.findViewById(R.id.txt_lbl_pending);
+        txt_lbl_completed = view.findViewById(R.id.txt_lbl_completed);
+        txt_lbl_close = view.findViewById(R.id.txt_lbl_close);
 
         openLayout = view.findViewById(R.id.back1);
         inprogressLayout = view.findViewById(R.id.back2);
@@ -127,47 +146,13 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         completeLayout = view.findViewById(R.id.back4);
         closeLayout = view.findViewById(R.id.back5);
 
+        ll_open = view.findViewById(R.id.ll_open);
+        ll_inprogress = view.findViewById(R.id.ll_inprogress);
+        ll_pending = view.findViewById(R.id.ll_pending);
+        ll_complete = view.findViewById(R.id.ll_complete);
+        ll_close = view.findViewById(R.id.ll_close);
 
-        openLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Open");
-                startActivity(intent);
-            }
-        });
-        inprogressLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Inprogress");
-                startActivity(intent);
-            }
-        });
-        pendingLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Pending");
-                startActivity(intent);
-            }
-        });
-        completeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Completed");
-                startActivity(intent);
-            }
-        });
-        closeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
-                intent.putExtra("ticketstatus","Close");
-                startActivity(intent);
-            }
-        });
+
 
         recyclerView = view.findViewById(R.id.recycler_view);
         emptyCustomFontTextView =  view.findViewById(R.id.empty_text);
@@ -245,14 +230,14 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         ll_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CMRLTicketListResponseCall();
+             //   CMRLTicketListResponseCall();
 
             }
         });
         btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CMRLTicketListResponseCall();
+              //  CMRLTicketListResponseCall();
 
             }
         });
@@ -351,9 +336,8 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
                 type =1;
-               // DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
-               // CMRLTicketListResponseCall();
-                StationNameResponseCall();
+
+                CmrlDashboardCountRequestCall();
                 elvalorLine.setVisibility(View.VISIBLE);
                 underLine.setVisibility(View.INVISIBLE);
             }
@@ -361,9 +345,8 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
                 type =2;
-                //DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
-               // CMRLTicketListResponseCall();
-                StationNameResponseCall();
+
+                CmrlDashboardCountRequestCall();
                 elvalorLine.setVisibility(View.INVISIBLE);
                 underLine.setVisibility(View.VISIBLE);
             }
@@ -404,11 +387,9 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         new Handler().postDelayed(() -> {
             // Refresh the department list to call api again
             if (selectStatus.equalsIgnoreCase("0")) {
-              //  DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
-                CMRLTicketListResponseCall();
+                CmrlDashboardCountRequestCall();
             } else {
-                //DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
-                CMRLTicketListResponseCall();
+                CmrlDashboardCountRequestCall();
             }
 
             mWaveSwipeRefreshLayout.setRefreshing(false);
@@ -457,70 +438,115 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
 
 
 
-    @SuppressLint("LogNotTimber")
-    private void CMRLTicketListResponseCall() {
-        dialog = new Dialog(getActivity(), R.style.NewProgressDialog);
+    @SuppressLint({"LogNotTimber", "UseRequireInsteadOfGet"})
+    private void CmrlDashboardCountRequestCall() {
+        dialog = new Dialog(Objects.requireNonNull(getActivity()), R.style.NewProgressDialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.progroess_popup);
         dialog.show();
 
         APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
-        Call<CMRLTicketListResponse> call = apiInterface.CMRLTicketListResponseCall(RestUtils.getContentType(), cmrlTicketListRequest());
-        Log.w(TAG,"CMRLTicketListResponse url  :%s"+" "+ call.request().url().toString());
+        Call<CmrlDashboardCountResponse> call = apiInterface.CmrlDashboardCountRequestCall(RestUtils.getContentType(), cmrlDashboardCountRequest());
+        Log.w(TAG,"CmrlDashboardCountResponse url  :%s"+" "+ call.request().url().toString());
 
-        call.enqueue(new Callback<CMRLTicketListResponse>() {
-            @SuppressLint("LogNotTimber")
+        call.enqueue(new Callback<CmrlDashboardCountResponse>() {
+            @SuppressLint({"LogNotTimber", "SetTextI18n"})
             @Override
-            public void onResponse(@NonNull Call<CMRLTicketListResponse> call, @NonNull Response<CMRLTicketListResponse> response) {
+            public void onResponse(@NonNull Call<CmrlDashboardCountResponse> call, @NonNull Response<CmrlDashboardCountResponse> response) {
                 dialog.dismiss();
-                Log.w(TAG,"SuccessResponse" + new Gson().toJson(response.body()));
+                Log.w(TAG,"CmrlDashboardCountResponse" + new Gson().toJson(response.body()));
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
-                        ticketList.clear();
-                        if(response.body().getData() != null && response.body().getData().size()>0){
-                          ticketList = response.body().getData();
+                        if(response.body().getData() != null){
+                            open_count = response.body().getData().getOpen_count();
+                            inprogress_count = response.body().getData().getInprogress_count();
+                            pending_count = response.body().getData().getPending_count();
+                            completed_count = response.body().getData().getCompleted_count();
+                            close_count = response.body().getData().getClose_count();
+
+                            txt_open_count.setText(response.body().getData().getOpen_count()+"");
+                            txt_inprogress_count.setText(response.body().getData().getInprogress_count()+"");
+                            txt_pending_count.setText(response.body().getData().getPending_count()+"");
+                            txt_completed_count.setText(response.body().getData().getCompleted_count()+"");
+                            txt_close_count.setText(response.body().getData().getClose_count()+"");
+
+
+                            if(open_count != 0){
+                                openLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Open");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{
+                                ll_open.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_open.setTextColor(Color.parseColor("#dddddd"));
+                            }
+                            if(inprogress_count != 0){
+                                inprogressLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Inprogress");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{ ll_inprogress.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_inprogres.setTextColor(Color.parseColor("#dddddd"));}
+                            if(pending_count != 0){
+                                pendingLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Pending");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{
+                                ll_pending.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_pending.setTextColor(Color.parseColor("#dddddd"));
+                            }
+                            if(completed_count != 0){
+                                completeLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus","Completed");
+                                        startActivity(intent);
+                                    }
+                                });
+                            } else{
+                                ll_complete.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_completed.setTextColor(Color.parseColor("#dddddd"));
+                            }
+                            if(close_count != 0) {
+                                closeLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), CMRLTicketCountsActivity.class);
+                                        intent.putExtra("ticketstatus", "Close");
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{ ll_close.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_close.setTextColor(Color.parseColor("#dddddd"));}
+
+
                         }
-
-                        if (ticketList != null && ticketList.size()>0) {
-                            recyclerView.setVisibility(View.VISIBLE);
-                            emptyImageView.setVisibility(View.GONE);
-                            retryButton.setVisibility(View.GONE);
-                            emptyCustomFontTextView.setVisibility(View.GONE);
-                            //ticketsListAdapter = new TicketsListAdapter(getActivity(), ticketList, "", "");
-
-
-                            mLayoutManager = new LinearLayoutManager(getActivity());
-                            recyclerView.setLayoutManager(mLayoutManager);
-                            recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-                            recyclerView.setAdapter(ticketsListAdapter);
-
-
-
-                        }
-                        else {
-                            recyclerView.setVisibility(View.GONE);
-                            emptyImageView.setVisibility(View.VISIBLE);
-                            retryButton.setVisibility(View.GONE);
-                            emptyCustomFontTextView.setVisibility(View.VISIBLE);
-                            emptyImageView.setImageResource(R.mipmap.empty_icon);
-                            emptyCustomFontTextView.setText("No Breakdowns");
-                        }
-
-
 
 
 
                     }
+
                 }
-
-
             }
 
             @SuppressLint("LongLogTag")
             @Override
-            public void onFailure(@NonNull Call<CMRLTicketListResponse> call,@NonNull Throwable t) {
+            public void onFailure(@NonNull Call<CmrlDashboardCountResponse> call,@NonNull Throwable t) {
                 dialog.dismiss();
                 Log.w("CMRLTicketListResponse flr", "--->" + t.getMessage());
 
@@ -528,20 +554,18 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         });
 
     }
-    private CMRLTicketListRequest cmrlTicketListRequest() {
+    private CmrlDashboardCountRequest cmrlDashboardCountRequest() {
+
 
         /*
-         * type : 1
-         * station_id : 611510c34f912e1856fc6d44
-         * break_down_reported_by : 6113acf26ee293224d81081c
+         * break_down_reported_by : 611ba6d611fce741ad463bc7
          */
-        CMRLTicketListRequest cmrlTicketListRequest = new CMRLTicketListRequest();
-        cmrlTicketListRequest.setStation_id(StationName_id);
-        cmrlTicketListRequest.setBreak_down_reported_by(id);
-        cmrlTicketListRequest.setType(String.valueOf(type));
-        cmrlTicketListRequest.setStatus(status);
-        Log.w(TAG,"cmrlTicketListRequest "+ new Gson().toJson(cmrlTicketListRequest));
-        return cmrlTicketListRequest;
+
+        CmrlDashboardCountRequest cmrlDashboardCountRequest = new CmrlDashboardCountRequest();
+        cmrlDashboardCountRequest.setBreak_down_reported_by(id);
+
+        Log.w(TAG,"cmrlDashboardCountRequest "+ new Gson().toJson(cmrlDashboardCountRequest));
+        return cmrlDashboardCountRequest;
     }
 
     @SuppressLint("LogNotTimber")
@@ -566,7 +590,6 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
-                        CMRLTicketListResponseCall();
                         stationNameList.clear();
                         if(response.body().getData() != null && response.body().getData().size()>0){
                             stationNameList = response.body().getData();
