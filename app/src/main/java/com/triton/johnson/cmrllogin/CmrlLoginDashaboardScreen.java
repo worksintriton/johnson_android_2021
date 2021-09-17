@@ -82,6 +82,7 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
     private String networkStatus = "";
     private String selectStatus = "0";
     private LinearLayout elvalorLine, underLine;
+    private LinearLayout elvalorLine1, underLine1;
     private String id;
     private LinearLayoutManager mLayoutManager;
 
@@ -161,6 +162,14 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
         LinearLayout elvatorLayout = view.findViewById(R.id.elvator_layout);
         LinearLayout underLayout = view.findViewById(R.id.under_layout);
         underLine =  view.findViewById(R.id.under_ground_line);
+
+
+        elvalorLine1 =  view.findViewById(R.id.elvator_line1);
+        LinearLayout elvatorLayout1 = view.findViewById(R.id.elvator_layout1);
+        LinearLayout underLayout1 = view.findViewById(R.id.under_layout1);
+        underLine1 =  view.findViewById(R.id.under_ground_line1);
+        underLine1.setVisibility(View.INVISIBLE);
+
 
         mWaveSwipeRefreshLayout = view.findViewById(R.id.main_swipe);
         floatingActionButton =  view.findViewById(R.id.fab_createevent);
@@ -278,6 +287,28 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
             spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item); // The drop down view
             spinner_ticket_status.setAdapter(spinnerArrayAdapter);
             StationNameResponseCall();
+
+
+        });
+
+        elvatorLayout1.setOnClickListener(view1 -> {
+            selectStatus = "0";
+            type = 1;
+            StationName_id = "";
+            elvalorLine1.setVisibility(View.VISIBLE);
+            underLine1.setVisibility(View.INVISIBLE);
+            status = "Open";
+            CmrlDashboardCountRequestCall();
+
+        });
+        underLayout1.setOnClickListener(view2 -> {
+            selectStatus = "1";
+            type = 2;
+            StationName_id = "";
+            elvalorLine1.setVisibility(View.INVISIBLE);
+            underLine1.setVisibility(View.VISIBLE);
+            status = "Open";
+            CmrlDashboardCountRequestCall();
 
 
         });
@@ -473,11 +504,14 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
 
 
                             if(open_count != 0){
+                                ll_open.getBackground().setColorFilter(Color.parseColor("#FF003F"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_open.setTextColor(Color.parseColor("#FF003F"));
                                 openLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Open");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
@@ -486,22 +520,28 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                                 txt_lbl_open.setTextColor(Color.parseColor("#dddddd"));
                             }
                             if(inprogress_count != 0){
+                                ll_inprogress.getBackground().setColorFilter(Color.parseColor("#1491FF"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_inprogres.setTextColor(Color.parseColor("#1491FF"));
                                 inprogressLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Inprogress");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
                             }else{ ll_inprogress.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
                                 txt_lbl_inprogres.setTextColor(Color.parseColor("#dddddd"));}
                             if(pending_count != 0){
+                                ll_pending.getBackground().setColorFilter(Color.parseColor("#FF9A00"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_pending.setTextColor(Color.parseColor("#FF9A00"));
                                 pendingLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Pending");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
@@ -510,11 +550,14 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                                 txt_lbl_pending.setTextColor(Color.parseColor("#dddddd"));
                             }
                             if(completed_count != 0){
+                                ll_complete.getBackground().setColorFilter(Color.parseColor("#AF4AFF"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_completed.setTextColor(Color.parseColor("#AF4AFF"));
                                 completeLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),CMRLTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Completed");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
@@ -523,15 +566,19 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
                                 txt_lbl_completed.setTextColor(Color.parseColor("#dddddd"));
                             }
                             if(close_count != 0) {
+                                ll_close.getBackground().setColorFilter(Color.parseColor("#00E59E"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_close.setTextColor(Color.parseColor("#00E59E"));
                                 closeLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(), CMRLTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus", "Close");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
-                            }else{ ll_close.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
+                            }else{
+                                ll_close.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
                                 txt_lbl_close.setTextColor(Color.parseColor("#dddddd"));}
 
 
@@ -563,6 +610,7 @@ public class CmrlLoginDashaboardScreen extends Fragment implements SwipeRefreshL
 
         CmrlDashboardCountRequest cmrlDashboardCountRequest = new CmrlDashboardCountRequest();
         cmrlDashboardCountRequest.setBreak_down_reported_by(id);
+        cmrlDashboardCountRequest.setType(type);
 
         Log.w(TAG,"cmrlDashboardCountRequest "+ new Gson().toJson(cmrlDashboardCountRequest));
         return cmrlDashboardCountRequest;

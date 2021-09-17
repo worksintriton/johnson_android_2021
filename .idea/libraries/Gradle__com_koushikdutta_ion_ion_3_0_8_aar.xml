@@ -1,13 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.koushikdutta.ion:ion:3.0.8@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/aeeb03acb4132ba1e1a3620f77253c9a/jetified-ion-3.0.8/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8e5d251c1f06636bfd928d2d920866e7/jetified-ion-3.0.8/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/ed6aaec8838c1aa7b28b3315de1220fb/jetified-ion-3.0.8/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/62d918249e722efbd6ad666463335e0c/jetified-ion-3.0.8/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8ee1b1dee46b1143d784733891342f7c/jetified-ion-3.0.8/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8ee1b1dee46b1143d784733891342f7c/jetified-ion-3.0.8/res" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8ee1b1dee46b1143d784733891342f7c/jetified-ion-3.0.8/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8ee1b1dee46b1143d784733891342f7c/jetified-ion-3.0.8/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.koushikdutta.ion/ion/3.0.8/38a3e95632ccfda657db36e19ee2bc07400fa12b/ion-3.0.8-javadoc.jar!/" />

@@ -2,7 +2,6 @@ package com.triton.johnson.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,36 +10,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.triton.johnson.R;
-import com.triton.johnson.admin.AdminStationList;
-import com.triton.johnson.api.ApiCall;
-import com.triton.johnson.api.RetrofitClient;
-import com.triton.johnson.arraylist.Adminstationlist;
-import com.triton.johnson.arraylist.DeapartmentStatusList;
-import com.triton.johnson.responsepojo.CMRLTicketListResponse;
-import com.triton.johnson.utils.ClockDrableTwo;
+import com.triton.johnson.api.RetrofitClient;import com.triton.johnson.responsepojo.CMRLTicketListResponse;
 import com.triton.johnson.view.CMRLUpdateStatusActivity;
-import com.triton.johnson.view.DepartmentStatusListClass;
-import com.triton.johnson.view.UpdateStatusActivity;
+
 import com.triton.johnson.view.ViewTickets;
 
-import org.joda.time.LocalDateTime;
 
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.text.ParseException;import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+
 
 /**
  * Created by Iddinesh.
@@ -50,7 +34,7 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
 
     private String issues, list;
 
-    private Activity context;
+    private Activity activity;
     //    private final LocalDateTime now = LocalDateTime.now().withTime(0, 0, 0, 0);
     private String updateAt;
     private String outTime;
@@ -88,15 +72,12 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
             txt_serving_level = view.findViewById(R.id.txt_serving_level);
         }
     }
-
-
     public TicketsListAdapter(Activity activity, List<CMRLTicketListResponse.DataBean> ticketList, String issues, String list) {
-        this.context = context;
+        this.activity = activity;
         this.ticketList = ticketList;
         this.issues = issues;
         this.list = list;
     }
-
     @NonNull
     @Override
     public TicketsListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -126,9 +107,10 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            String outputDateStr = outputFormat.format(date);
-            Log.w(TAG,"outputDateStr : "+outputDateStr);
-            if(outputDateStr != null) {
+            String outputDateStr = null;
+            if (date != null) {
+                outputDateStr = outputFormat.format(date);
+                Log.w(TAG,"outputDateStr : "+outputDateStr);
                 String[] splitdate = outputDateStr.split("\\s+");
                 String strdateone = splitdate[0];
                 String strmonthone = splitdate[1];
@@ -138,11 +120,12 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
                 holder.monthTextView.setText(strmonthone);
                 holder.yearTextview.setText(stryearone);
             }
+
         }
 
        if (dataBean.getImage_list() != null && dataBean.getImage_list().size()>0) {
             Log.w(TAG,"ImagePath : "+RetrofitClient.BASE_URL+dataBean.getImage_list().get(0).getImage_path());
-            Glide.with(context)
+            Glide.with(activity)
                     .load(RetrofitClient.BASE_URL+dataBean.getImage_list().get(0).getImage_path())
                     .into(holder.circularImageView);
         }
@@ -228,26 +211,26 @@ public class TicketsListAdapter extends RecyclerView.Adapter<TicketsListAdapter.
 
 
         holder.wholeLayout.setOnClickListener(view -> {
-            Intent intent = new Intent(context, ViewTickets.class);
+            Intent intent = new Intent(activity, ViewTickets.class);
             intent.putExtra("ticketId", dataBean.getTicket_no());
            /* intent.putExtra("departmentCode", movie.getName());
             intent.putExtra("stationLocation", movie.getStationType());
             intent.putExtra("ticket_status", movie.getStatus());
             intent.putExtra("ticket", movie.getMessage());
             intent.putExtra("title", list + " - " + movie.getName());*/
-            context.startActivity(intent);
-            context.overridePendingTransition(R.anim.new_right, R.anim.new_left);
+            activity.startActivity(intent);
+            activity.overridePendingTransition(R.anim.new_right, R.anim.new_left);
         });
         holder.rscheduleLinearLayout.setOnClickListener(view -> {
-            Intent intent = new Intent(context, CMRLUpdateStatusActivity.class);
+            Intent intent = new Intent(activity, CMRLUpdateStatusActivity.class);
             intent.putExtra("ticketId", dataBean.getTicket_no());
             intent.putExtra("ticketStatus", dataBean.getStatus());
            /* intent.putExtra("departmentCode", movie.getName());
             intent.putExtra("stationLocation", movie.getStationType());
             intent.putExtra("ticketStatus", movie.getName());
             intent.putExtra("issues", movie.getMessage());*/
-            context.startActivity(intent);
-            context.overridePendingTransition(R.anim.new_right, R.anim.new_left);
+            activity.startActivity(intent);
+            activity.overridePendingTransition(R.anim.new_right, R.anim.new_left);
 
 
         });

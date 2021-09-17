@@ -33,7 +33,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.Gson;
+
 import com.triton.johnson.R;
 import com.triton.johnson.adapter.JohnsonTicketsListAdapter;
 import com.triton.johnson.api.APIInterface;
@@ -84,6 +84,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
     private Button retryButton;
     private String networkStatus = "", selectStatus = "0", tabSelects;
     private LinearLayout elvalorLine, underLine;
+    private LinearLayout elvalorLine1, underLine1;
     private String id;
     private LinearLayoutManager mLayoutManager;
 
@@ -164,6 +165,15 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         LinearLayout elvatorLayout = view.findViewById(R.id.elvator_layout);
         LinearLayout underLayout = view.findViewById(R.id.under_layout);
         underLine =  view.findViewById(R.id.under_ground_line);
+
+
+
+        elvalorLine1 =  view.findViewById(R.id.elvator_line1);
+        LinearLayout elvatorLayout1 = view.findViewById(R.id.elvator_layout1);
+        LinearLayout underLayout1 = view.findViewById(R.id.under_layout1);
+        underLine1 =  view.findViewById(R.id.under_ground_line1);
+        underLine1.setVisibility(View.INVISIBLE);
+
 
         mWaveSwipeRefreshLayout = view.findViewById(R.id.main_swipe);
         floatingActionButton =  view.findViewById(R.id.fab_createevent);
@@ -284,6 +294,33 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             underLine.setVisibility(View.VISIBLE);
            // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
             StationNameResponseCall();
+
+
+        });
+        elvatorLayout1.setOnClickListener(view1 -> {
+            selectStatus = "0";
+            tabSelects = "0";
+            type = 1;
+            StationName_id = "";
+            JobName_id = "";
+            status = "Open";
+            elvalorLine1.setVisibility(View.VISIBLE);
+            underLine1.setVisibility(View.INVISIBLE);
+
+            JohnsonDashboardCountRequestCall();
+
+
+        });
+        underLayout1.setOnClickListener(view2 -> {
+            selectStatus = "1";
+            tabSelects = "1";
+            type = 2;
+            StationName_id = "";
+            JobName_id = "";
+            status = "Open";
+            elvalorLine1.setVisibility(View.INVISIBLE);
+            underLine1.setVisibility(View.VISIBLE);
+            JohnsonDashboardCountRequestCall();
 
 
         });
@@ -491,7 +528,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                 dialog.dismiss();
 
 
-                Log.w(TAG,"StationNameResponseCall" + new Gson().toJson(response.body()));
+                //Log.w(TAG,"StationNameResponseCall" + new Gson().toJson(response.body()));
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
@@ -521,7 +558,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
     }
     private void setStationNameList(List<StationNameResponse.DataBean> data) {
-        Log.w(TAG, "data : " + new Gson().toJson(data));
+        //Log.w(TAG, "data : " + new Gson().toJson(data));
 
         if (data != null && data.size() > 0) {
             ArrayList<String> StationArrayList = new ArrayList<>();
@@ -552,7 +589,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
         StationNameRequest stationNameRequest = new StationNameRequest();
         stationNameRequest.setType(type);
-        Log.w(TAG,"stationNameRequest "+ new Gson().toJson(stationNameRequest));
+      //  Log.w(TAG,"stationNameRequest "+ new Gson().toJson(stationNameRequest));
         return stationNameRequest;
     }
     @SuppressLint("LogNotTimber")
@@ -571,7 +608,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             @Override
             public void onResponse(@NonNull Call<JohnsonTicketListResponse> call, @NonNull Response<JohnsonTicketListResponse> response) {
                 dialog.dismiss();
-                Log.w(TAG,"JohnsonTicketListResponse" + new Gson().toJson(response.body()));
+               // Log.w(TAG,"JohnsonTicketListResponse" + new Gson().toJson(response.body()));
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
@@ -643,7 +680,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
         johnsonTicketListRequest.setStation_id(StationName_id);
         johnsonTicketListRequest.setJob_id(JobName_id);
         johnsonTicketListRequest.setStatus(status);
-        Log.w(TAG,"johnsonTicketListRequest "+ new Gson().toJson(johnsonTicketListRequest));
+       // Log.w(TAG,"johnsonTicketListRequest "+ new Gson().toJson(johnsonTicketListRequest));
         return johnsonTicketListRequest;
     }
     @SuppressLint("LogNotTimber")
@@ -662,7 +699,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             @Override
             public void onResponse(@NonNull Call<JobNoListResponse> call, @NonNull Response<JobNoListResponse> response) {
                 dialog.dismiss();
-                Log.w(TAG,"JobNoListResponse" + new Gson().toJson(response.body()));
+               // Log.w(TAG,"JobNoListResponse" + new Gson().toJson(response.body()));
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
@@ -718,7 +755,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
         JobNoListRequest jobNoListRequest = new JobNoListRequest();
         jobNoListRequest.setStation_id(stationName_id);
-        Log.w(TAG,"jobNoListRequest "+ new Gson().toJson(jobNoListRequest));
+       // Log.w(TAG,"jobNoListRequest "+ new Gson().toJson(jobNoListRequest));
         return jobNoListRequest;
     }
 
@@ -739,7 +776,7 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
             @Override
             public void onResponse(@NonNull Call<CmrlDashboardCountResponse> call, @NonNull Response<CmrlDashboardCountResponse> response) {
                 dialog.dismiss();
-                Log.w(TAG,"JohnsonDashboardCountRequestCall" + new Gson().toJson(response.body()));
+                //Log.w(TAG,"JohnsonDashboardCountRequestCall" + new Gson().toJson(response.body()));
                 if (response.body() != null) {
 
                     if (200 == response.body().getCode()) {
@@ -758,11 +795,14 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
 
                             if(open_count != 0){
+                                ll_open.getBackground().setColorFilter(Color.parseColor("#FF003F"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_open.setTextColor(Color.parseColor("#FF003F"));
                                 openLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Open");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
@@ -771,22 +811,28 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                                 txt_lbl_open.setTextColor(Color.parseColor("#dddddd"));
                             }
                             if(inprogress_count != 0){
+                                ll_inprogress.getBackground().setColorFilter(Color.parseColor("#1491FF"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_inprogres.setTextColor(Color.parseColor("#1491FF"));
                                 inprogressLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Inprogress");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
                             }else{ ll_inprogress.getBackground().setColorFilter(Color.parseColor("#dddddd"), PorterDuff.Mode.SRC_ATOP);
                                 txt_lbl_inprogres.setTextColor(Color.parseColor("#dddddd"));}
                             if(pending_count != 0){
+                                ll_pending.getBackground().setColorFilter(Color.parseColor("#FF9A00"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_pending.setTextColor(Color.parseColor("#FF9A00"));
                                 pendingLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Pending");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
@@ -795,11 +841,14 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                                 txt_lbl_pending.setTextColor(Color.parseColor("#dddddd"));
                             }
                             if(completed_count != 0){
+                                ll_complete.getBackground().setColorFilter(Color.parseColor("#AF4AFF"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_completed.setTextColor(Color.parseColor("#AF4AFF"));
                                 completeLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(),JohnsonTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus","Completed");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
@@ -808,11 +857,14 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
                                 txt_lbl_completed.setTextColor(Color.parseColor("#dddddd"));
                             }
                             if(close_count != 0) {
+                                ll_close.getBackground().setColorFilter(Color.parseColor("#00E59E"), PorterDuff.Mode.SRC_ATOP);
+                                txt_lbl_close.setTextColor(Color.parseColor("#00E59E"));
                                 closeLayout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         Intent intent = new Intent(getActivity(), JohnsonTicketCountsActivity.class);
                                         intent.putExtra("ticketstatus", "Close");
+                                        intent.putExtra("type",type);
                                         startActivity(intent);
                                     }
                                 });
@@ -844,12 +896,14 @@ public class JohnsonLoginDashaboardScreen extends Fragment implements SwipeRefre
 
         /*
          * break_down_reported_by : 611ba6d611fce741ad463bc7
+         * type
          */
 
         CmrlDashboardCountRequest cmrlDashboardCountRequest = new CmrlDashboardCountRequest();
         cmrlDashboardCountRequest.setBreak_down_reported_by("");
+        cmrlDashboardCountRequest.setType(type);
 
-        Log.w(TAG,"cmrlDashboardCountRequest "+ new Gson().toJson(cmrlDashboardCountRequest));
+       // Log.w(TAG,"cmrlDashboardCountRequest "+ new Gson().toJson(cmrlDashboardCountRequest));
         return cmrlDashboardCountRequest;
     }
 

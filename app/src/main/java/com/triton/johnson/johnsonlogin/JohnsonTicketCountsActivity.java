@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -94,7 +95,8 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
     private List<JobNoListResponse.DataBean> JobNoList = new ArrayList<>();
     private List<JohnsonTicketListResponse.DataBean> ticketList = new ArrayList<>();
 
-    LinearLayout ll_search,ll_clear,ll_job_no,ll_ticket_status;
+    LinearLayout ll_search,ll_clear,ll_job_no,ll_ticket_status,ll_search_clear,ll_station_name;
+    RelativeLayout rl_filters;
     Button btn_search;
     private String status = "Open";
     ArrayAdapter<String> spinnerArrayAdapter;
@@ -115,7 +117,8 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             ticketstatus = bundle.getString("ticketstatus");
-            Log.w(TAG,"ticketstatus : "+ticketstatus);
+            type = bundle.getInt("type");
+            Log.w(TAG,"ticketstatus : "+ticketstatus+" type : "+type);
         }
 
 
@@ -214,6 +217,47 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
 
             }
         });
+
+
+        rl_filters = findViewById(R.id.rl_filters);
+        ll_search_clear = findViewById(R.id.ll_search_clear);
+        ll_station_name = findViewById(R.id.ll_station_name);
+
+        ll_ticket_status.setVisibility(View.GONE);
+        ll_job_no.setVisibility(View.GONE);
+        ll_search_clear.setVisibility(View.GONE);
+        ll_station_name.setVisibility(View.GONE);
+
+        rl_filters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!ll_ticket_status.isShown()){
+                    ll_ticket_status.setVisibility(View.VISIBLE);
+                    ll_job_no.setVisibility(View.VISIBLE);
+                    ll_search_clear.setVisibility(View.VISIBLE);
+                    ll_station_name.setVisibility(View.VISIBLE);
+                }else{
+                    ll_ticket_status.setVisibility(View.GONE);
+                    ll_job_no.setVisibility(View.GONE);
+                    ll_search_clear.setVisibility(View.GONE);
+                    ll_station_name.setVisibility(View.GONE);
+
+                }
+            }
+        });
+
+
+
+
+
+        if(type == 1){
+            elvalorLine.setVisibility(View.VISIBLE);
+            underLine.setVisibility(View.INVISIBLE);
+        }else{
+            type = 2;
+            elvalorLine.setVisibility(View.INVISIBLE);
+            underLine.setVisibility(View.VISIBLE);
+        }
 
 
 
@@ -316,21 +360,23 @@ public class JohnsonTicketCountsActivity extends AppCompatActivity  implements S
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
                 tabSelects = "0";
-                type = 1;
+               // type = 1;
+                Log.w(TAG,"JohnshonLoginDashboardActivity.tabSelects if : "+tabSelects+"  type :"+type);
                 liftJobNoListResponseCall();
-                //DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
-                elvalorLine.setVisibility(View.VISIBLE);
-                underLine.setVisibility(View.INVISIBLE);
+               // elvalorLine.setVisibility(View.VISIBLE);
+                //underLine.setVisibility(View.INVISIBLE);
             }
             else if (JohnshonLoginDashboardActivity.tabSelects.equalsIgnoreCase("1")) {
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
                 tabSelects = "1";
-                type = 2;
+               // type = 2;
+                Log.w(TAG,"JohnshonLoginDashboardActivity.tabSelects else : "+tabSelects+"  type :"+type);
+
                 elivatorJobNoListResponseCall();
                 // DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
-                elvalorLine.setVisibility(View.INVISIBLE);
-                underLine.setVisibility(View.VISIBLE);
+               // elvalorLine.setVisibility(View.INVISIBLE);
+               // underLine.setVisibility(View.VISIBLE);
             }
 
 

@@ -7,6 +7,15 @@ public class CmrlDashboardCountRequest {
      */
 
     private String break_down_reported_by;
+    private int  type;
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 
     public String getBreak_down_reported_by() {
         return break_down_reported_by;

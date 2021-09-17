@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,6 +99,9 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
     private String JobNo = "";
     private String Job_id = "";
 
+    RelativeLayout rl_filters;
+    LinearLayout ll_ticket_status,ll_station_name,ll_search_clear;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +117,8 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             ticketstatus = bundle.getString("ticketstatus");
-            Log.w(TAG,"ticketstatus : "+ticketstatus);
+            type = bundle.getInt("type");
+            Log.w(TAG,"ticketstatus : "+ticketstatus+" type : "+type);
         }
 
 
@@ -246,6 +251,39 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
             }
         });
 
+        rl_filters = findViewById(R.id.rl_filters);
+        ll_ticket_status = findViewById(R.id.ll_ticket_status);
+        ll_station_name = findViewById(R.id.ll_station_name);
+        ll_search_clear = findViewById(R.id.ll_search_clear);
+
+        ll_ticket_status.setVisibility(View.GONE);
+        ll_search_clear.setVisibility(View.GONE);
+        ll_station_name.setVisibility(View.GONE);
+
+        rl_filters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!ll_ticket_status.isShown()){
+                    ll_ticket_status.setVisibility(View.VISIBLE);
+                    ll_search_clear.setVisibility(View.VISIBLE);
+                    ll_station_name.setVisibility(View.VISIBLE);
+                }else{
+                    ll_ticket_status.setVisibility(View.GONE);
+                    ll_search_clear.setVisibility(View.GONE);
+                    ll_station_name.setVisibility(View.GONE);
+
+                }
+            }
+        });
+
+        if(type == 1){
+            elvalorLine.setVisibility(View.VISIBLE);
+            underLine.setVisibility(View.INVISIBLE);
+        }else{
+            type = 2;
+            elvalorLine.setVisibility(View.INVISIBLE);
+            underLine.setVisibility(View.VISIBLE);
+        }
         elvatorLayout.setOnClickListener(view1 -> {
             selectStatus = "0";
             type = 1;
@@ -330,24 +368,24 @@ public class CMRLTicketCountsActivity extends AppCompatActivity implements Swipe
             if (CmrlLoginDashboardActivity.tabSelects.equalsIgnoreCase("0")) {
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
-                type =1;
+               // type =1;
                 // DepaartmentUrl(ApiCall.API_URL+"get_estationtickets_new.php?user_id=" + id);
                 // CMRLTicketListResponseCall();
                // StationNameResponseCall();
                 liftJobNoListResponseCall();
-                elvalorLine.setVisibility(View.VISIBLE);
-                underLine.setVisibility(View.INVISIBLE);
+                //elvalorLine.setVisibility(View.VISIBLE);
+               // underLine.setVisibility(View.INVISIBLE);
             }
             else if (CmrlLoginDashboardActivity.tabSelects.equalsIgnoreCase("1")) {
                 mWaveSwipeRefreshLayout.setVisibility(View.VISIBLE);
                 floatingActionButton.setVisibility(View.GONE);
-                type =2;
+                //type =2;
                 //DepaartmentUrl(ApiCall.API_URL+"get_ustationtickets_new.php?user_id=" + id);
                 // CMRLTicketListResponseCall();
                // StationNameResponseCall();
                 elivatorJobNoListResponseCall();
-                elvalorLine.setVisibility(View.INVISIBLE);
-                underLine.setVisibility(View.VISIBLE);
+                //elvalorLine.setVisibility(View.INVISIBLE);
+               // underLine.setVisibility(View.VISIBLE);
             }
 
 
