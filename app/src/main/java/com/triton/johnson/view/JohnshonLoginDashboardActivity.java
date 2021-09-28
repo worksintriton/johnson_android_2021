@@ -12,20 +12,31 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
 import com.triton.johnson.R;
+import com.triton.johnson.api.APIInterface;
+import com.triton.johnson.api.RetrofitClient;
 import com.triton.johnson.johnsonlogin.JohnsonLoginAttendanceScreen;
 import com.triton.johnson.johnsonlogin.JohnsonLoginDashaboardScreen;
+import com.triton.johnson.requestpojo.LogoutRequest;
+import com.triton.johnson.responsepojo.SuccessResponse;
 import com.triton.johnson.session.SessionManager;
 import com.triton.johnson.sweetalertdialog.SweetAlertDialog;
+import com.triton.johnson.utils.RestUtils;
 
 import java.util.HashMap;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class JohnshonLoginDashboardActivity extends AppCompatActivity {
 
@@ -40,6 +51,7 @@ public class JohnshonLoginDashboardActivity extends AppCompatActivity {
     public static String tabSelects;
     private FragmentTransaction transaction;
     private Dialog dialog;
+    private String userid;
 
     @SuppressLint("ApplySharedPref")
     @Override
@@ -52,6 +64,8 @@ public class JohnshonLoginDashboardActivity extends AppCompatActivity {
         sessionManager = new SessionManager(JohnshonLoginDashboardActivity.this);
         HashMap<String, String> hashMap = sessionManager.getUserDetails();
         code = hashMap.get(SessionManager.KEY_STATION_CODE);
+        userid = hashMap.get(SessionManager.KEY_ID);
+
         Intent intent = getIntent();
         if (intent.getStringExtra("Tabselects") != null) {
             tabSelects = intent.getStringExtra("Tabselects");
@@ -115,9 +129,8 @@ public class JohnshonLoginDashboardActivity extends AppCompatActivity {
                 .showCancelButton(true)
                 .setCancelClickListener(Dialog::dismiss)
                 .setConfirmClickListener(sDialog -> {
-                    getSharedPreferences("Station", 0).edit().clear().commit();
-                    sessionManager.logoutUser();
                     sDialog.dismiss();
+                    logoutResponseCall();
                 })
                 .show());
         setupDrawerContent(nvDrawer);
@@ -243,6 +256,47 @@ public class JohnshonLoginDashboardActivity extends AppCompatActivity {
 
 
     }
+
+    @SuppressLint("LogNotTimber")
+    private void logoutResponseCall() {
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<SuccessResponse> call = apiInterface.logoutResponseCall(RestUtils.getContentType(), logoutRequest());
+        Log.w(TAG,"logoutResponseCall url  :%s"+" "+ call.request().url().toString());
+
+        call.enqueue(new Callback<SuccessResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<SuccessResponse> call, @NonNull Response<SuccessResponse> response) {
+                Log.w(TAG, "logoutResponseCall" + "--->" + new Gson().toJson(response.body()));
+
+                if (response.body() != null) {
+                    if (response.body().getCode() == 200) {
+                        getSharedPreferences("Station", 0).edit().clear().commit();
+                        sessionManager.logoutUser();
+
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<SuccessResponse> call, @NonNull Throwable t) {
+                Log.w(TAG,"logoutResponseCall flr"+"--->" + t.getMessage());
+                //Toasty.success(getApplicationContext(),"NotificationUpdateResponse flr : "+t.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+            }
+        });
+
+    }
+    private LogoutRequest logoutRequest() {
+        LogoutRequest logoutRequest = new LogoutRequest();
+        logoutRequest.setUser_id(userid);
+        Log.w(TAG,"logoutRequest"+ "--->" + new Gson().toJson(logoutRequest));
+        //  Toasty.success(getApplicationContext(),"fbTokenUpdateRequest : "+new Gson().toJson(fbTokenUpdateRequest), Toast.LENGTH_SHORT, true).show();
+
+        return logoutRequest;
+    }
+
 
 
 }

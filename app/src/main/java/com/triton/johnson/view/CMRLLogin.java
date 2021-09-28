@@ -24,13 +24,18 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.triton.johnson.R;
 import com.triton.johnson.api.APIInterface;
 import com.triton.johnson.api.RetrofitClient;
 import com.triton.johnson.materialeditext.MaterialEditText;
 import com.triton.johnson.materialspinner.MaterialSpinner;
+import com.triton.johnson.requestpojo.FBTokenUpdateRequest;
 import com.triton.johnson.requestpojo.LoginRequest;
+import com.triton.johnson.responsepojo.FBTokenUpdateResponse;
 import com.triton.johnson.responsepojo.LoginResponse;
 import com.triton.johnson.session.SessionManager;
 import com.triton.johnson.sweetalertdialog.SweetAlertDialog;
@@ -74,6 +79,8 @@ public class CMRLLogin extends AppCompatActivity {
     SessionManager sessionManager;
 
     private String TAG ="CMRLLogin";
+    private String userid;
+    private String token;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -98,6 +105,38 @@ public class CMRLLogin extends AppCompatActivity {
 
         loginMainLinearLayout =  findViewById(R.id.login_main_layout);
         forgotLinearLayout =  findViewById(R.id.forgot_layout);
+
+
+
+
+        try{
+            // Initialize Firebase
+            FirebaseApp.initializeApp(getApplicationContext());
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
+            FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+            FirebaseMessaging.getInstance().getToken()
+                    .addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        token = task.getResult();
+                        Log.w(TAG,"token--->"+ token);
+
+
+
+                    });
+
+
+
+        }
+        catch (Exception e){
+            Log.w(TAG,"FCM : "+e.getLocalizedMessage());
+            Log.w(TAG,"FCM Message : "+e.getMessage());
+            e.printStackTrace();
+        }
 
         employeeMaterialEditText.setOnTouchListener((view, motionEvent) -> {
 
@@ -376,47 +415,36 @@ public class CMRLLogin extends AppCompatActivity {
             @SuppressLint("LogNotTimber")
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
-                dialog.dismiss();
+
                 Log.w(TAG,"SignupResponse" + new Gson().toJson(response.body()));
                 if (response.body() != null) {
                     message = response.body().getMessage();
                     if (200 == response.body().getCode()) {
-                        new SweetAlertDialog(CMRLLogin.this, SweetAlertDialog.SUCCESS_TYPE)
-                                .setTitleText("CMRL")
-                                .setContentText(message)
-                                .setConfirmText("Ok")
-                                .setConfirmClickListener(sDialog -> {
+                        if(response.body().getData() != null){
+                            userid =  response.body().getData().get_id();
+                            sessionManager.createSessionLogin(
+                                    response.body().getData().get_id(),
+                                    String.valueOf(response.body().getData().getEmployee_id()),
+                                    response.body().getData().getUsername(),
+                                    response.body().getData().getUsername(),
+                                    response.body().getData().getUser_email(),
+                                    response.body().getData().getUser_phone(),
+                                    String.valueOf(response.body().getData().getUser_type())
+                            );
+                            fBTokenUpdateResponseCall();
+                        }
 
-                                    sDialog.dismiss();
-                                    sessionManager.setIsLogin(true);
-                                    if(response.body().getData() != null){
-                                        sessionManager.createSessionLogin(
-                                                response.body().getData().get_id(),
-                                                String.valueOf(response.body().getData().getEmployee_id()),
-                                                response.body().getData().getUsername(),
-                                                response.body().getData().getUsername(),
-                                                response.body().getData().getUser_email(),
-                                                response.body().getData().getUser_phone(),
-                                                String.valueOf(response.body().getData().getUser_type())
-                                        );
-                                    }
-
-                                    Intent intent = new Intent(CMRLLogin.this, CmrlLoginDashboardActivity.class);
-                                    startActivity(intent);
-                                    overridePendingTransition(R.anim.new_right, R.anim.new_left);
-
-                                })
-                                .show();
-
-
-
-                    } else {
+                        
+                    }
+                    else {
+                        dialog.dismiss();
                         new SweetAlertDialog(CMRLLogin.this, SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("CMRL")
                                 .setContentText(message)
                                 .setConfirmText("Ok")
                                 .setConfirmClickListener(Dialog::dismiss)
                                 .show();
+
                         //showErrorLoading(response.body().getMessage());
                     }
                 }
@@ -448,6 +476,61 @@ public class CMRLLogin extends AppCompatActivity {
         loginRequest.setPassword(passwordMaterialEditText.getText().toString());
         Log.w(TAG,"loginRequest "+ new Gson().toJson(loginRequest));
         return loginRequest;
+    }
+
+
+    @SuppressLint("LogNotTimber")
+    private void fBTokenUpdateResponseCall() {
+        APIInterface apiInterface = RetrofitClient.getClient().create(APIInterface.class);
+        Call<FBTokenUpdateResponse> call = apiInterface.fBTokenUpdateResponseCall(RestUtils.getContentType(), fbTokenUpdateRequest());
+        Log.w(TAG,"fBTokenUpdateResponseCall url  :%s"+" "+ call.request().url().toString());
+
+        call.enqueue(new Callback<FBTokenUpdateResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<FBTokenUpdateResponse> call, @NonNull Response<FBTokenUpdateResponse> response) {
+                dialog.dismiss();
+                Log.w(TAG,"fBTokenUpdateResponseCall"+ "--->" + new Gson().toJson(response.body()));
+
+                if (response.body() != null) {
+                    if(response.body().getCode() == 200){
+                        new SweetAlertDialog(CMRLLogin.this, SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText("CMRL")
+                                .setContentText(message)
+                                .setConfirmText("Ok")
+                                .setConfirmClickListener(sDialog -> {
+                                    sDialog.dismiss();
+                                    sessionManager.setIsLogin(true);
+                                    Intent intent = new Intent(CMRLLogin.this, CmrlLoginDashboardActivity.class);
+                                    startActivity(intent);
+                                    overridePendingTransition(R.anim.new_right, R.anim.new_left);
+
+                                })
+                                .show();
+                    }
+                  
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<FBTokenUpdateResponse> call, @NonNull Throwable t) {
+                dialog.dismiss();
+                Log.w(TAG,"FBTokenUpdateResponse flr"+"--->" + t.getMessage());
+                //Toasty.success(getApplicationContext(),"NotificationUpdateResponse flr : "+t.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+            }
+        });
+
+    }
+    private FBTokenUpdateRequest fbTokenUpdateRequest() {
+        FBTokenUpdateRequest fbTokenUpdateRequest = new FBTokenUpdateRequest();
+        fbTokenUpdateRequest.setUser_id(userid);
+        fbTokenUpdateRequest.setFb_token(token);
+        Log.w(TAG,"fbTokenUpdateRequest"+ "--->" + new Gson().toJson(fbTokenUpdateRequest));
+        //  Toasty.success(getApplicationContext(),"fbTokenUpdateRequest : "+new Gson().toJson(fbTokenUpdateRequest), Toast.LENGTH_SHORT, true).show();
+
+        return fbTokenUpdateRequest;
     }
 }
 

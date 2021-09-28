@@ -5,10 +5,12 @@ import com.triton.johnson.requestpojo.AttendanceCreateRequest;
 import com.triton.johnson.requestpojo.CMRLTicketListRequest;
 import com.triton.johnson.requestpojo.CheckAttendanceRequest;
 import com.triton.johnson.requestpojo.CmrlDashboardCountRequest;
+import com.triton.johnson.requestpojo.FBTokenUpdateRequest;
 import com.triton.johnson.requestpojo.FaultTypeListRequest;
 import com.triton.johnson.requestpojo.JobNoListRequest;
 import com.triton.johnson.requestpojo.JohnsonTicketListRequest;
 import com.triton.johnson.requestpojo.LoginRequest;
+import com.triton.johnson.requestpojo.LogoutRequest;
 import com.triton.johnson.requestpojo.ServingLevelListRequest;
 import com.triton.johnson.requestpojo.StationNameRequest;
 import com.triton.johnson.requestpojo.TicketCreateRequest;
@@ -17,6 +19,7 @@ import com.triton.johnson.requestpojo.ViewTicketsRequest;
 import com.triton.johnson.responsepojo.CMRLTicketListResponse;
 import com.triton.johnson.responsepojo.CheckAttendanceResponse;
 import com.triton.johnson.responsepojo.CmrlDashboardCountResponse;
+import com.triton.johnson.responsepojo.FBTokenUpdateResponse;
 import com.triton.johnson.responsepojo.FaultTypeListResponse;
 import com.triton.johnson.responsepojo.JobNoListResponse;
 import com.triton.johnson.responsepojo.JobNumberResponse;
@@ -121,6 +124,16 @@ public interface APIInterface {
     /*lift job_no list*/
     @GET("job_no/get_jobno/lift")
     Call<JobNumberResponse> liftJobNoListResponseCall(@Header("Content-Type") String type);
+
+
+    /*Notification token update*/
+    @POST("userdetails/mobile/update/fb_token")
+    Call<FBTokenUpdateResponse> fBTokenUpdateResponseCall(@Header("Content-Type") String type, @Body FBTokenUpdateRequest fbTokenUpdateRequest);
+
+
+    /*session clear*/
+    @POST("userdetails/logout")
+    Call<SuccessResponse> logoutResponseCall(@Header("Content-Type") String type, @Body LogoutRequest logoutRequest);
 
 
 }

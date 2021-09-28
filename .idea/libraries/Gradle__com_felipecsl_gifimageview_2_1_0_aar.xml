@@ -4,6 +4,9 @@
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/970e138c89a84166110570560850b653/jetified-gifimageview-2.1.0/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/970e138c89a84166110570560850b653/jetified-gifimageview-2.1.0/res" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/970e138c89a84166110570560850b653/jetified-gifimageview-2.1.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/37ef0ff5ebdee8d41c17ff94e016e734/jetified-gifimageview-2.1.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/37ef0ff5ebdee8d41c17ff94e016e734/jetified-gifimageview-2.1.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/37ef0ff5ebdee8d41c17ff94e016e734/jetified-gifimageview-2.1.0/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.felipecsl/gifimageview/2.1.0/123be12d9cf8d2378d8934e1a5d9744b94fda2be/gifimageview-2.1.0-javadoc.jar!/" />
